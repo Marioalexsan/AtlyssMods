@@ -1,0 +1,17 @@
+https://pixabay.com/sound-effects/mouse-click-290204/ = click01_var01.mp3
+https://pixabay.com/sound-effects/mouse-click-104737/ = click01_var02.mp3
+https://pixabay.com/sound-effects/mouse-click-sound-233951/ = click01_var03.mp3
+
+Marc A. Pullen - Fragging Fanatical - 01 Intro = main_menu
+Marc A. Pullen - Fragging Fanatical - 02 Destiny = main_menu_rare
+
+# The following are from https://github.com/Marioalexsan/ProjectSilver/blob/main/LICENSE-ASSETS.md
+
+"Grunt2 - Death Pain.wav" by tonsil5 = oof.ogg
+"oof - qdo.wav" by qdo = oof_rare.ogg
+"HeavyRingingClang.mp3" by wilhellboy = wall_hit.ogg
+"HeavyRingingClang.mp3" by wilhellboy = wall_hit_rare.ogg (pitched up)
+"HeavyRingingClang.mp3" by wilhellboy = echo.ogg (echoes added)
+
+"Button V03" by volkbutphan = hit01
+"Pistol Dry Fire (Bersa BP9CC 9x19)" by Sophia_C = hit02

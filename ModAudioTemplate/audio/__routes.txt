@@ -1,0 +1,102 @@
+# Example __routes.txt file by Marioalexsan
+# Empty lines and comments (lines starting with #) are ignored.
+
+# ===== Pack metadata ===== #
+
+# Set an ID for your audio pack.
+# This should be as unique as possible. If not set, one will be made for you.
+
+%id Marioalexsan_MyCoolTemplateMod
+
+# Set a display name. This is used in the UI for configuration options.
+# If not set, a (very ugly) display name will be made for you.
+
+%displayname My Cool Template Mod
+
+# Modify the volume of your custom clips. This allows you to both amplify and attenuate clips.
+# In fact, this is the only way to edit the volume of custom clips in a reliable way.
+
+%customclipvolume click01_var01 = 0.8 
+%customclipvolume click01_var02 = 1.2
+%customclipvolume click01_var03 = 1.5
+
+# ===== Basic replacements ===== #
+
+# This is the old 1.1.0 format for creating audio replacements.
+# It's still supported and is a really simple format for routes, but it lacks features.
+# The mod will automatically load the corresponding targetClipName's audio file
+# The format is as follows:
+#
+#    sourceClipName = targetClipName / randomWeight
+#    sourceClipName = targetClipName
+#
+# When using the second format, randomWeight is set to 1.0
+
+_mu_flyby = main_menu / 4.0
+_mu_flyby = main_menu_rare
+
+_uiHover = click01_var01
+_uiHover = click01_var02
+_uiHover = click01_var03
+
+# ===== Advanced replacements ===== #
+
+# Advanced replacements, overlays, and effects can be made using the full format:
+#
+#    sourceClipNames = targetClips @ overlayClips ~ effects
+#
+# It's not necessary for targetClips, overlayClips, and effects to be all present, or to be in this order.
+# You can switch them around as long as you have at least one of them. For example:
+#
+#    sourceClips = targetClips ~ effects @ overlayClips
+#    sourceClips = targetClips @ overlayClips
+#    sourceClips = targetClips ~ effects
+#    sourceClips = targetClips
+#    sourceClips @ overlayClips
+#    sourceClips ~ effects
+
+# sourceClipNames must be an array of one or more clip names, separated by pipes ("|").
+
+# targetClips and overlayClips must be an array of strings, separated by pipes ("|"), that follow this format:
+#
+#    name : selectionWeight : volume : pitch
+#
+# You can specify anything from one value (just the name) up to 4 values (all of the modifiers and weight), but values must come in order.
+# The default value for selectionWeight, volume and pitch is 1.0
+# When there's more than one clip in such an array, and this route is chosen, the mod selects between one of them randomly based on selectionWeight.
+or a route.
+
+# This plays hit01 2/3rds of the time, and hit02 1/3rd of the time.
+
+weaponHit_Normal(average) | weaponHit_Normal(heavy) | weaponHit_Normal(light) = hit01 | hit02 : 0.5
+
+# This plays the same clip, but 5/6ths of the time it has a volume and pitch of 0.5, while 1/6th of the time it has a volume and pitch of 0.8 / 1.5
+
+_blockHit = block : 1.0 : 0.5 : 0.5 | block : 0.2 : 0.8 : 1.5
+
+# This plays one of two clips alongside the original clip, i.e. without replacing it.
+# If you specify a replacement, then the corresponding overlay can only play if the replacement was selected.
+# Additionally, multiple overlays for the same source clip can trigger individually, unlike replacements.
+
+_weaponHitWall @ oof : 1.0 : 0.5 : 0.5 | oof_rare : 0.2 : 0.8 : 1.5
+
+# effects must be an array of a property name and a value, separated by pipes ("|"), for example:
+#
+#    propertyName : propertyValue
+#
+# Valid property names are "volume", "pitch", and "weight".
+# Effects are applied to the audio source, and can either be a volume, pitch modifier, or the replacement weight for a route.
+
+# Applies an effect to the vanilla day music. Keep in mind that volume modifiers that aren't set with %customclipvolume can be overriden by ATLYSS at any time.
+mu_snatchsprings ~ volume : 0.4 | pitch : 1.5
+
+# You can use ___default___ to specify a route where the clip is "replaced" with itself
+# You can use ___nothing___ to specify a route where the clip is "replaced" with empty audio ("silence")
+# When multiple replacements apply to the same source clip, you can specify how often a branch is selected by specifying the weight in effects
+
+# You can use ___default___ to specify a route where the clip is "replaced" with itself.
+# You can use ___nothing___ to specify a route where the clip is "replaced" with empty audio ("silence"). This might be useful alongside overlays to hack around some issues with audio cutting off.
+
+_weaponHitWall = ___default___ ~ weight : 1.0
+_weaponHitWall = wall_hit : 1.0 : 0.5 : 0.5 | wall_hit_rare : 0.2 : 0.8 : 1.5 @ echo ~ weight : 0.4
+
