@@ -9,7 +9,11 @@ import json
 
 def keep_assembly_dependency(assembly):
   WHITELISTED_ASSEMBLIES = [
-    "Microsoft.Win32.Registry"
+    "Microsoft.Win32.Registry",
+    "System.Memory",
+    "Sustem.Buffers",
+    "System.Runtime.CompilerServices.Unsafe",
+    "System.ValueTuple"
   ]
 
   IGNORED_ASSEMBLIES = [

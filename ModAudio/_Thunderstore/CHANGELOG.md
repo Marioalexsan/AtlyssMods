@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2025-May-22
+
+### Fixed
+
+- Fixed replacement weight not working as expected with `source = replacement / weight` routes
+- Switched from UnityWebRequestMultimedia to NAudio for loading audio files (previously was only used for streaming)
+  - This should fix an issue where some MP3 files wouldn't load / play correctly, but audio might load slower as a result
+- Fixed mod crashing if an exception is thrown while reading route files
+- Fixed warning log spam when EasySettings version would differ from the expected version (should now warn at most once)
+
+### Changed
+
+- Audio packs should now be sorted by display name in EasySettings
+
 ## [2.2.1] - 2025-Mar-31
 
 ### Fixed

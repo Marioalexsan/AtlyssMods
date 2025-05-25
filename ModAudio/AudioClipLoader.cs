@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -7,13 +8,9 @@ namespace Marioalexsan.ModAudio;
 public static class AudioClipLoader
 {
     public static readonly string[] SupportedLoadExtensions = [
-        ".aiff",
-        ".aif",
-        ".mp3",
-        ".ogg",
         ".wav",
-        ".aac",
-        ".alac"
+        ".ogg",
+        ".mp3"
     ];
 
     public static readonly string[] SupportedStreamExtensions = [
@@ -22,7 +19,7 @@ public static class AudioClipLoader
         ".mp3"
     ];
 
-    public static readonly string[] SupportedExtensions = [.. SupportedStreamExtensions, .. SupportedLoadExtensions];
+    public static readonly string[] SupportedExtensions = SupportedLoadExtensions.Concat(SupportedStreamExtensions).Distinct().ToArray();
 
     /// <summary>
     /// Creates an empty clip with the given name and duration.
@@ -39,32 +36,71 @@ public static class AudioClipLoader
     /// </summary>
     public static AudioClip LoadFromFile(string clipName, string path, float volumeModifier)
     {
-        using var request = UnityWebRequestMultimedia.GetAudioClip(new Uri($"{path}"), AudioType.UNKNOWN);
-        request.SendWebRequest();
-
-        while (!request.isDone)
+        if (path.EndsWith(".ogg"))
         {
-            Thread.Yield();
+            using var stream = File.OpenRead(path);
+            return LoadOgg(clipName, stream);
         }
 
-        if (request.result != UnityWebRequest.Result.Success)
-            throw new Exception($"Request for audio clip {path} failed.");
+        if (path.EndsWith(".mp3"))
+        {
+            using var stream = File.OpenRead(path);
+            return LoadMp3(clipName, stream);
+        }
 
-        DownloadHandlerAudioClip dlHandler = (DownloadHandlerAudioClip)request.downloadHandler;
+        if (path.EndsWith(".wav"))
+        {
+            using var stream = File.OpenRead(path);
+            return LoadWav(clipName, stream);
+        }
 
-        var clip = dlHandler.audioClip;
-        clip.name = clipName;
+        throw new NotImplementedException("The given file format isn't supported for loading.");
+    }
 
-        // Adjust volume
+    private static AudioClip LoadOgg(string clipName, Stream stream)
+    {
+        using var reader = new NVorbis.VorbisReader(stream);
 
-        float[] samples = new float[clip.samples * clip.channels];
-        clip.GetData(samples, 0);
+        var clip = AudioClip.Create(clipName, (int)reader.TotalSamples, reader.Channels, reader.SampleRate, false);
 
-        OptimizedMethods.MultiplyFloatArray(samples, volumeModifier);
-
+        var samples = new float[reader.TotalSamples * reader.Channels];
+        reader.ReadSamples(samples, 0, samples.Length);
         clip.SetData(samples, 0);
 
-        dlHandler.Dispose();
+        return clip;
+    }
+
+    private static AudioClip LoadWav(string clipName, Stream stream)
+    {
+        using var reader = new WaveFileReader(stream);
+
+        var clip = AudioClip.Create(clipName, (int)reader.SampleCount, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+
+        var provider = reader.ToSampleProvider();
+
+        var samples = new float[(int)reader.SampleCount * reader.WaveFormat.Channels];
+
+        provider.Read(samples, 0, samples.Length);
+        clip.SetData(samples, 0);
+
+        return clip;
+    }
+
+    private static AudioClip LoadMp3(string clipName, Stream stream)
+    {
+        using var reader = new Mp3FileReader(stream);
+
+        var totalSamples = (int)(reader.Length * 8 / reader.WaveFormat.BitsPerSample);
+
+        var clip = AudioClip.Create(clipName, totalSamples, reader.WaveFormat.Channels, reader.WaveFormat.SampleRate, false);
+
+        var provider = reader.ToSampleProvider();
+
+        var samples = new float[totalSamples * reader.WaveFormat.Channels];
+
+        provider.Read(samples, 0, samples.Length);
+        clip.SetData(samples, 0);
+
         return clip;
     }
 
@@ -119,7 +155,7 @@ public static class AudioClipLoader
 
         public void OnAudioRead(float[] samples)
         {
-            _reader.ReadSamples(samples);
+            _reader.ReadSamples(samples, 0, samples.Length);
             OptimizedMethods.MultiplyFloatArray(samples, VolumeModifier);
         }
 

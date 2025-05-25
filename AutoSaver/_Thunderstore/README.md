@@ -27,6 +27,8 @@ To fix item bank corruption:
   - `ATLYSS/Marioalexsan_AutoSaver/ItemBank/_latest/itemBank_1` -> `ATLYSS_Data/profileCollections/atl_itemBank_01` (overwriting previous corrupt file if needed)
   - `ATLYSS/Marioalexsan_AutoSaver/ItemBank/_latest/itemBank_2` -> `ATLYSS_Data/profileCollections/atl_itemBank_02` (overwriting previous corrupt file if needed)
 
+In addition to the `_latest` save files that are saved on any game version, the mod will also save `_latest_version` save files for each game version you play on, allowing you to restore to an older version if needed.
+
 # Mod Compatibility
 
 This mod version targets ATLYSS v1.6.2b. It also has experimental support for the public test branch (version 2.0.5d).
@@ -35,5 +37,6 @@ The mod has compatibility with the following mods:
 
 - "More Bank Tabs" v0.1.1 - if this mod is detected, AutoSaver will try to backup the three extra slots created by it.
   - Extra slots will follow the format `MoreBankTabs_itemBank_{X}`, where X is the extra slot.
+- Nessie's EasySettings v1.1.6 (optional dependency used for configuration)
 
  Compatibility with other game versions is not guaranteed, especially for updates with major changes.

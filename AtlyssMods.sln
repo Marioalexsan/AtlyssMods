@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordRPC", "_Submodules\d
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtraSaveSlots", "ExtraSaveSlots\ExtraSaveSlots.csproj", "{2F073BD5-8232-4908-840B-C4A5F183D7F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceMarkerPrepatcher", "PerformanceMarkerPrepatcher\PerformanceMarkerPrepatcher.csproj", "{E680D9C7-644A-48E9-A19F-F803E123EF07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{2F073BD5-8232-4908-840B-C4A5F183D7F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F073BD5-8232-4908-840B-C4A5F183D7F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F073BD5-8232-4908-840B-C4A5F183D7F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

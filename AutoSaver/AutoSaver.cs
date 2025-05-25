@@ -42,7 +42,7 @@ public class AutoSaver : BaseUnityPlugin
 
     public bool DetectedMoreBankTabsMod { get; private set; } = false;
 
-    private readonly char[] BannedChars = [.. Path.GetInvalidPathChars(), .. Path.GetInvalidFileNameChars()];
+    private readonly char[] BannedChars = [.. Path.GetInvalidPathChars(), .. Path.GetInvalidFileNameChars(), '.'];
 
     private string ObsoleteModDataFolderPath => Path.Combine(ProfileDataManager._current._dataPath, ModDataFolderName);
     private readonly string ModDataFolderName = "Marioalexsan_AutoSaver";
@@ -52,6 +52,8 @@ public class AutoSaver : BaseUnityPlugin
     private string MultiSavesFolderPath => Path.Combine(ModDataFolderPath, "Multi");
 
     private bool _checkedForOldAutosaverBackups = false;
+
+    private string GameVersion => Application.version;
 
     public AutoSaver()
     {
@@ -129,7 +131,7 @@ public class AutoSaver : BaseUnityPlugin
                 }
                 catch (Exception e)
                 {
-                    Logging.LogError($"AutoSaevr crashed in OnApplySettings! Please report this error to the mod developer:");
+                    Logging.LogError($"AutoSaver crashed in OnApplySettings! Please report this error to the mod developer:");
                     Logging.LogError(e.ToString());
                 }
             });
@@ -234,7 +236,7 @@ public class AutoSaver : BaseUnityPlugin
             {
                 Logging.LogInfo($"Saving player data for {player._nickname}");
                 Directory.CreateDirectory(MultiSavesFolderPath);
-                CharacterAutoSaver.TrySaveSpecificProfileToLocation(player, Path.Combine(MultiSavesFolderPath, SanitizePlayerName(player)));
+                CharacterAutoSaver.TrySaveSpecificProfileToLocation(player, Path.Combine(MultiSavesFolderPath, SanitizeString(player._nickname)));
 
                 if (!CharacterAutoSaver.SaveDone)
                 {
@@ -251,43 +253,38 @@ public class AutoSaver : BaseUnityPlugin
         AutosaveCurrentItemBank();
     }
 
-    public string SanitizedCurrentTime
+    public string SanitizedCurrentTime => SanitizeStringSimple(DateTime.UtcNow.ToString("yyyy:MM:dd-HH:mm:ss", CultureInfo.InvariantCulture));
+
+    public string SanitizeStringSimple(string str)
     {
-        get
+        for (int i = 0; i < BannedChars.Length; i++)
         {
-            var time = DateTime.UtcNow.ToString("yyyy:MM:dd-HH:mm:ss", CultureInfo.InvariantCulture);
-
-            for (int i = 0; i < BannedChars.Length; i++)
-            {
-                time = time.Replace($"{BannedChars[i]}", "_");
-            }
-
-            return time;
+            str = str.Replace($"{BannedChars[i]}", $"_");
         }
+
+        return str;
     }
 
-    public string SanitizePlayerName(Player player)
+    public string SanitizeString(string str)
     {
-        var playerName = player._nickname;
-
         for (int i = 0; i < BannedChars.Length; i++)
         {
             int codePoint = char.ConvertToUtf32($"{BannedChars[i]}", 0);
-            playerName = playerName.Replace($"{BannedChars[i]}", $"_{codePoint}");
+            str = str.Replace($"{BannedChars[i]}", $"_{codePoint}");
         }
 
-        return playerName;
+        return str;
     }
 
     public string GetBackupNameForCurrentPlayer()
     {
         if (AppendSlotToSaveName.Value)
         {
-            return $"{SanitizePlayerName(Player._mainPlayer)}_slot{ProfileDataManager._current._selectedFileIndex}";
+            return $"{SanitizeString(Player._mainPlayer._nickname)}_slot{ProfileDataManager._current._selectedFileIndex}";
         }
         else
         {
-            return $"{SanitizePlayerName(Player._mainPlayer)}";
+            return $"{SanitizeString(Player._mainPlayer._nickname)}";
         }
     }
 
@@ -305,7 +302,7 @@ public class AutoSaver : BaseUnityPlugin
             names.Add(Path.GetFileName(directory));
         }
 
-        names.Remove("_latest");
+        names.RemoveAll(x => x.Contains("_latest"));
         names.Sort();
 
         while (names.Count > SaveCountToKeep)
@@ -339,7 +336,7 @@ public class AutoSaver : BaseUnityPlugin
             names.Add(Path.GetFileName(file));
         }
 
-        names.Remove("_latest");
+        names.RemoveAll(x => x.Contains("_latest"));
         names.Sort();
 
         while (names.Count > SaveCountToKeep)
@@ -372,13 +369,19 @@ public class AutoSaver : BaseUnityPlugin
                 if (DetectedMoreBankTabsMod)
                     ItemBankAutoSaver.SaveModBankTabsToLocation(itembankFolder);
 
-                var latestSave = Path.Combine(ItemBankFolderPath, "_latest");
-                Directory.CreateDirectory(latestSave);
-
-                foreach (var path in Directory.EnumerateFiles(itembankFolder))
+                void CopySaves(string saveName)
                 {
-                    File.Copy(path, Path.Combine(latestSave, Path.GetFileName(path)), true);
+                    var latestSave = Path.Combine(ItemBankFolderPath, saveName);
+                    Directory.CreateDirectory(latestSave);
+
+                    foreach (var path in Directory.EnumerateFiles(itembankFolder))
+                    {
+                        File.Copy(path, Path.Combine(latestSave, Path.GetFileName(path)), true);
+                    }
                 }
+
+                CopySaves("_latest");
+                CopySaves($"_latest_version_{SanitizeStringSimple(GameVersion)}");
             }
 
             RunItemBankGarbageCollector();
@@ -412,6 +415,7 @@ public class AutoSaver : BaseUnityPlugin
             if (CharacterAutoSaver.SaveDone)
             {
                 File.Copy(filePath, Path.Combine(characterFolder, "_latest"), true);
+                File.Copy(filePath, Path.Combine(characterFolder, $"_latest_version_{SanitizeStringSimple(GameVersion)}"), true);
             }
 
             RunCharacterGarbageCollector();

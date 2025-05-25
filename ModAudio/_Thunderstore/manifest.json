@@ -1,7 +1,7 @@
 {
   "name": "ModAudio",
   "description": "Replace game audio with your own mixtape.",
-  "version_number": "2.2.1",
+  "version_number": "2.2.2",
   "dependencies": [
     "BepInEx-BepInExPack-5.4.2100",
     "Nessie-EasySettings-1.1.3"

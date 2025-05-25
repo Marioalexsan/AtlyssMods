@@ -111,9 +111,9 @@ public class RouteConfig
                 {
                     OriginalClips = [clipName],
                     ReplacementClips = [new() {
-                        Name = replacementName,
-                        Weight = randomWeight
-                    }]
+                        Name = replacementName
+                    }],
+                    ReplacementWeight = randomWeight
                 });
                 continue;
             }
