@@ -110,6 +110,13 @@ public class AudioPackConfig
         public bool LinkOverlayAndReplacement { get; set; } = true;
 
         /// <summary>
+        /// If true, overlays will stop if the source audio is stopped programatically.
+        /// If false, overlays will continue to play even if the source audio is stopped.
+        /// </summary>
+        [JsonProperty("overlay_stops_if_source_stops", Required = Required.DisallowNull)]
+        public bool OverlayStopsIfSourceStops { get; set; } = true;
+
+        /// <summary>
         /// If true, replacement effects (volume, pitch, etc.) are modifiers on top of the original source.
         /// If false, replacement effects override the original source's effects.
         /// </summary>
@@ -164,6 +171,14 @@ public class AudioPackConfig
         public List<string> FilterByObject { get; set; } = [];
 
         /// <summary>
+        /// A list of map instance names that act as filters. If empty, the filter is disabled.
+        /// You can use this to discriminate between audio played in different maps.
+        /// As a special case, ___nomap___ matches any cases where there isn't an active map available.
+        /// </summary>
+        [JsonProperty("filter_by_map_name", Required = Required.DisallowNull)]
+        public List<string> FilterByMapName { get; set; } = [];
+
+        /// <summary>
         /// Determines how often the replacement from this route will be used relative to other replacements.
         /// </summary>
         [JsonProperty("replacement_weight", Required = Required.DisallowNull)]
@@ -180,6 +195,12 @@ public class AudioPackConfig
         /// </summary>
         [JsonProperty("pitch", Required = Required.DisallowNull)]
         public float Pitch { get; set; } = 1f;
+
+        /// <summary>
+        /// If set to true, the audio source will be forced to loop even if it normally shouldn't.
+        /// </summary>
+        [JsonProperty("force_loop", Required = Required.DisallowNull)]
+        public bool ForceLoop { get; set; } = false;
     }
 
     /// <summary>

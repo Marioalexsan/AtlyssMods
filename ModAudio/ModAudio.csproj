@@ -8,7 +8,7 @@
         <Product>ModAudio</Product>
         <AssemblyName>Marioalexsan.ModAudio</AssemblyName>
         <RootNamespace>Marioalexsan.ModAudio</RootNamespace>
-        <Version>2.2.2</Version>
+        <Version>2.3.0</Version>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>

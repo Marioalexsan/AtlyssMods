@@ -10,17 +10,20 @@ internal static class AudioEngine
         public AudioClip? Clip;
         public float Volume;
         public float Pitch;
+        public bool Loop;
 
         // (supposedly) Current state
         public AudioClip? AppliedClip;
         public float AppliedVolume;
         public float AppliedPitch;
+        public bool AppliedLoop;
 
         // Flags
         public bool DisableRouting;
         public bool IsOneShotSource;
         public bool IsOverlay;
         public bool IsCustomEvent;
+        public bool OneShotStopsIfSourceStops;
 
         // Temporary Flags
         public bool JustRouted;
@@ -134,6 +137,29 @@ internal static class AudioEngine
                 return false;
         }
 
+        if (route.FilterByMapName.Count > 0)
+        {
+            var matchesMap = false;
+            var currentMap = Player._mainPlayer?.Network_playerMapInstance?._mapName;
+
+            for (int i = 0; i < route.FilterByMapName.Count; i++)
+            {
+                if (route.FilterByMapName[i] == "___nomap___" && currentMap == null)
+                {
+                    matchesMap = true;
+                    break;
+                }
+                else if (route.FilterByMapName[i] == currentMap)
+                {
+                    matchesMap = true;
+                    break;
+                }
+            }
+
+            if (!matchesMap)
+                return false;
+        }
+
         return true;
     }
 
@@ -190,6 +216,7 @@ internal static class AudioEngine
                     source.Key.clip = source.Value.Clip;
                     source.Key.volume = source.Value.Volume;
                     source.Key.pitch = source.Value.Pitch;
+                    source.Key.loop = source.Value.Loop;
                 }
             }
 
@@ -324,9 +351,11 @@ internal static class AudioEngine
                 AppliedClip = source.clip,
                 Clip = source.clip,
                 Pitch = source.pitch,
+                Loop = source.loop,
                 Volume = source.volume,
                 AppliedPitch = source.pitch,
-                AppliedVolume = source.volume
+                AppliedVolume = source.volume,
+                AppliedLoop = source.loop
             });
         }
     }
@@ -499,6 +528,18 @@ internal static class AudioEngine
         if (TrackedSources[source].IsCustomEvent)
             messageDisplay += " event";
 
+        if (TrackedSources[source].AppliedLoop)
+        {
+            if (TrackedSources[source].AppliedLoop != TrackedSources[source].Loop)
+            {
+                messageDisplay += " loop(forced)";
+            }
+            else
+            {
+                messageDisplay += " loop";
+            }
+        }
+
         Logging.LogInfo(messageDisplay, ModAudio.Plugin.LogAudioPlayed);
     }
 
@@ -570,7 +611,7 @@ internal static class AudioEngine
                     source,
                     static (in KeyValuePair<AudioSource?, SourceState> trackedSource, in AudioSource stoppedSource) =>
                     {
-                        if (trackedSource.Value.IsOneShotSource && trackedSource.Value.OneShotOrigin == stoppedSource && trackedSource.Key != null && trackedSource.Key.isPlaying)
+                        if (trackedSource.Value.IsOneShotSource && trackedSource.Value.OneShotStopsIfSourceStops && trackedSource.Value.OneShotOrigin == stoppedSource && trackedSource.Key != null && trackedSource.Key.isPlaying)
                         {
                             trackedSource.Key.Stop();
                         }
@@ -638,6 +679,21 @@ internal static class AudioEngine
                 // Restore original volume
                 source.pitch = trackedData.Pitch;
             }
+
+            if (source.loop != trackedData.AppliedLoop)
+            {
+                // Loop must have been changed externally, set it as new original loop
+                TrackedSources[source] = TrackedSources[source] with
+                {
+                    Loop = source.loop,
+                    AppliedLoop = source.loop
+                };
+            }
+            else
+            {
+                // Restore original loop
+                source.loop = trackedData.Loop;
+            }
         }
 
         if (trackedData.JustRouted || trackedData.DisableRouting)
@@ -677,10 +733,14 @@ internal static class AudioEngine
                 source.pitch = replacementRoute.Value.Route.Pitch;
             }
 
+            if (replacementRoute.Value.Route.ForceLoop)
+                source.loop = true;
+
             TrackedSources[source] = TrackedSources[source] with
             {
                 AppliedPitch = source.pitch,
-                AppliedVolume = source.volume
+                AppliedVolume = source.volume,
+                AppliedLoop = source.loop
             };
 
             // Apply replacement if needed
@@ -715,7 +775,8 @@ internal static class AudioEngine
                         AppliedClip = destinationClip,
                         JustRouted = true,
                         AppliedPitch = source.pitch,
-                        AppliedVolume = source.volume
+                        AppliedVolume = source.volume,
+                        AppliedLoop = source.loop
                     };
 
                     if (source.clip != destinationClip && source.isPlaying)
@@ -773,16 +834,21 @@ internal static class AudioEngine
                         oneShotSource.pitch = randomSelection.Pitch;
                     }
 
+                    if (Route.ForceLoop)
+                        oneShotSource.loop = true;
+
                     TrackedSources[oneShotSource] = TrackedSources[oneShotSource] with
                     {
                         Pitch = oneShotSource.pitch,
                         Volume = oneShotSource.volume,
                         AppliedPitch = oneShotSource.pitch,
                         AppliedVolume = oneShotSource.volume,
+                        AppliedLoop = oneShotSource.loop,
                         Clip = oneShotSource.clip,
                         AppliedClip = oneShotSource.clip,
                         IsOverlay = true,
-                        DisableRouting = true
+                        DisableRouting = true,
+                        OneShotStopsIfSourceStops = Route.OverlayStopsIfSourceStops
                     };
 
                     oneShotSource.Play();

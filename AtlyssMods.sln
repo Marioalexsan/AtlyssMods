@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordRPC", "_Submodules\d
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtraSaveSlots", "ExtraSaveSlots\ExtraSaveSlots.csproj", "{2F073BD5-8232-4908-840B-C4A5F183D7F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceMarkerPrepatcher", "PerformanceMarkerPrepatcher\PerformanceMarkerPrepatcher.csproj", "{E680D9C7-644A-48E9-A19F-F803E123EF07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepProfilingPrepatcher", "DeepProfilingPrepatcher\DeepProfilingPrepatcher.csproj", "{70A95C35-05A7-4020-9B12-AAF351D4C278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,10 +68,10 @@ Global
 		{2F073BD5-8232-4908-840B-C4A5F183D7F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F073BD5-8232-4908-840B-C4A5F183D7F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F073BD5-8232-4908-840B-C4A5F183D7F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E680D9C7-644A-48E9-A19F-F803E123EF07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
