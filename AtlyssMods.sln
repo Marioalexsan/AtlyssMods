@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepProfilingPrepatcher", "DeepProfilingPrepatcher\DeepProfilingPrepatcher.csproj", "{70A95C35-05A7-4020-9B12-AAF351D4C278}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllowAnyNames", "AllowAnyNames\AllowAnyNames.csproj", "{77467403-4255-EA73-72EC-87D29D956878}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multitool", "Multitool\Multitool.csproj", "{B8C7625D-737B-099A-53B6-F7D57DE58B5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +28,14 @@ Global
 		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70A95C35-05A7-4020-9B12-AAF351D4C278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77467403-4255-EA73-72EC-87D29D956878}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77467403-4255-EA73-72EC-87D29D956878}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77467403-4255-EA73-72EC-87D29D956878}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77467403-4255-EA73-72EC-87D29D956878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

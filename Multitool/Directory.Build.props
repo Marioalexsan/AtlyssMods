@@ -1,0 +1,25 @@
+<Project>
+    <!-- Specify here the path to ATLYSS's install folder -->
+    <PropertyGroup>
+        <AtlyssPath>D:\SteamLibrary\steamapps\common\ATLYSS\</AtlyssPath>
+    </PropertyGroup>
+
+    <!-- Thunderstore configuration -->
+    <PropertyGroup>
+        <!-- Create a package? -->
+        <CreateThunderstorePackage>true</CreateThunderstorePackage>
+
+        <ThunderstorePackageName>Multitool</ThunderstorePackageName>
+        <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
+        <ThunderstorePackageDescription>Swiss army knife of APIs for mods.</ThunderstorePackageDescription>
+        <ThunderstoreWebsite>https://github.com/Marioalexsan/AtlyssMods/</ThunderstoreWebsite>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Thunderstore dependency strings -->
+        <ThunderstoreDependency Include="BepInEx-BepInExPack-5.4.2100" Visible="false" />
+        
+        <!-- Output items to include from build assemblies -->
+        <ThunderstoreAssemblyInclude Include="$(AssemblyName).dll" Visible="false" />
+        <ThunderstoreAssemblyInclude Include="$(AssemblyName).xml" Visible="false" />
+    </ItemGroup>
+</Project>
