@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AllowAnyNames", "AllowAnyNa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multitool", "Multitool\Multitool.csproj", "{B8C7625D-737B-099A-53B6-F7D57DE58B5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterPrismUI", "BetterPrismUI\BetterPrismUI.csproj", "{71F38B45-E4D6-0F64-753F-825C80552021}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8C7625D-737B-099A-53B6-F7D57DE58B5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71F38B45-E4D6-0F64-753F-825C80552021}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71F38B45-E4D6-0F64-753F-825C80552021}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71F38B45-E4D6-0F64-753F-825C80552021}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71F38B45-E4D6-0F64-753F-825C80552021}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
