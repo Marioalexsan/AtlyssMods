@@ -1,0 +1,24 @@
+<Project>
+    <!-- Specify here the path to ATLYSS's install folder -->
+    <PropertyGroup>
+        <AtlyssPath>D:\SteamLibrary\steamapps\common\ATLYSS\</AtlyssPath>
+    </PropertyGroup>
+
+    <!-- Thunderstore configuration -->
+    <PropertyGroup>
+        <!-- Create a package? -->
+        <CreateThunderstorePackage>true</CreateThunderstorePackage>
+
+        <ThunderstorePackageName>BeyondLimitsPatcher</ThunderstorePackageName>
+        <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
+        <ThunderstorePackageDescription>Fixes some stuff in Buttered Lily's BeyondLimits mod.</ThunderstorePackageDescription>
+        <ThunderstoreWebsite>https://github.com/Marioalexsan/AtlyssMods/</ThunderstoreWebsite>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Thunderstore dependency strings -->
+        <ThunderstoreDependency Include="ButteredLilly-ButteredLillysBeyondLimits-3.0.8" Visible="false" />
+        
+        <!-- Output items to include from build assemblies -->
+        <ThunderstoreAssemblyInclude Include="$(AssemblyName).dll" Visible="false" />
+    </ItemGroup>
+</Project>
