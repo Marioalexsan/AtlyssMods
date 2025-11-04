@@ -14,8 +14,6 @@ static class SaveProfileData
         var index = __instance._selectedFileIndex;
         var characterFile = __instance._characterFile;
 
-        Logging.LogDebug($"Executing SaveProfileData for slot {index}!");
-
         try
         {
             ExecuteSaveCallbacks(characterFile, index);

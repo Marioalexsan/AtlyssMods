@@ -1,6 +1,6 @@
 # Better Prism UI
 
-Adds an overlay to the health orb that indicates how much of your original Prism damage absorbion is left.
+Adds an overlay to the health orb that indicates how much of your original Prism damage absorbtion is left.
 
 # Mod Compatibility
 

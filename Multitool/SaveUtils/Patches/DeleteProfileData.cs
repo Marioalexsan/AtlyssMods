@@ -13,8 +13,6 @@ static class DeleteProfileData
     {
         var characterFile = __instance._characterFiles[_index];
 
-        Logging.LogDebug($"Executing DeleteProfileData for slot {_index}!");
-
         try
         {
             ExecuteDeleteCallbacks(characterFile, _index);

@@ -13,8 +13,6 @@ static class LoadProfileData
     {
         var characterFile = __instance._characterFiles[_index];
 
-        Logging.LogDebug($"Executing LoadProfileData for slot {_index}!");
-
         if (characterFile._isEmptySlot)
             return;
 
