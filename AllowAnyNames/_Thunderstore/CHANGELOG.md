@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2025-Nov-15
+
+### Changed
+- Name updates sent / received are no longer logged
+- Rich text names are now sanitized so that broken or abusable tags are stripped
+  - `<size=N>` is now limited between a size of 8 and 30 - other values are considered invalid and will be stripped
+  - `<color=#RRGGBBAA>` formats must now have an alpha value of at least `0x20` (i.e. 12.5% opacity), otherwise it will be stripped
+  - some TextMeshPro specific tags that are abusable are now stripped
+
 ## [2.0.0] - 2025-Oct-31
 
 ### Added

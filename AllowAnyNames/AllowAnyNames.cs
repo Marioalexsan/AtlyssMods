@@ -7,8 +7,12 @@ using HarmonyLib;
 using Marioalexsan.Multitool.SaveUtils;
 using Marioalexsan.Multitool.Utils;
 using Mirror;
+using Newtonsoft.Json;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
@@ -98,7 +102,7 @@ static class HandleRenameInterface
             CreateRenameUserInteface.RenamePromptButton!.interactable = !__instance._deleteCharacterPrompt && !ProfileDataManager._current._characterFile._isEmptySlot;
             CreateRenameUserInteface.RenameButton!.interactable = false;
             CreateRenameUserInteface.ReturnButton!.interactable = false;
-            CreateRenameUserInteface.RenameInputText!.text = AllowAnyNames.GetCharacterRichTextName(ProfileDataManager._current._characterFile);
+            CreateRenameUserInteface.RenameInputText!.text = AllowAnyNames.GetRawCharacterRichTextName(ProfileDataManager._current._characterFile);
         }
     }
 }
@@ -332,7 +336,19 @@ static class FullRichTextReplacements
 
 class AllowAnyNamesSave
 {
-    public string RichTextName { get; set; } = "";
+    private string _richTextName = "";
+    public string RichTextName
+    {
+        get => _richTextName;
+        set
+        {
+            _richTextName = value;
+            SanitizedRichTextName = AllowAnyNames.SanitizeRichTextName(value);
+        }
+    }
+
+    [JsonIgnore]
+    public string SanitizedRichTextName { get; private set; } = "";
 }
 
 [BepInPlugin(ModInfo.GUID, ModInfo.NAME, ModInfo.VERSION)]
@@ -344,7 +360,7 @@ public class AllowAnyNames : BaseUnityPlugin
 
     public struct MultiplayerPlayerData
     {
-        public string CustomName;
+        public string SanitizedCustomName;
         public DateTime LastUpdate;
     }
 
@@ -370,8 +386,70 @@ public class AllowAnyNames : BaseUnityPlugin
         Logger = base.Logger;
         _harmony.PatchAll();
 
+        //TestSanitization();
+
         CodeTalkerNetwork.RegisterListener<NameUpdatePacket>(OnNameUpdate);
         SaveUtilsAPI.RegisterProfileData<AllowAnyNamesSave>(ModInfo.GUID, SaveProfileData, LoadProfileData, DeleteProfileData);
+    }
+
+    static void TestSanitization()
+    {
+        string[] names = [
+            "test123", // No tags
+            "<color=blue>test123</color>", // Valid tag
+            "<color=red><color=blue>test123</color></color>", // Nested valid tags
+            "<color=blue>test123</color><b>test234</b>", // Sequential valid tags
+            "test123</b></color>", // Invalid closing tags
+            "<>test123</>", // Empty tags
+            "<color=blue><b>test123", // Unclosed valid opening tags
+            "<color =blue>test123</color>", // Invalid tag name
+            "<color= blue>test123</color>", // Invalid tag parameter
+            "<b=blue>test123</b>", // Valid tag name, but parameters are not allowed
+            "<color=blue>test123</color=red>", // Invalid closing tag since parameters are not allowed
+
+            // Size tag validation
+            "<size=1>test123</size>", // Invalid
+            "<size=7>test123</size>", // Invalid
+            "<size=8>test123</size>", // Valid
+            "<size=30>test123</size>", // Valid
+            "<size=31>test123</size>", // Invalid
+            "<size=999>test123</size>", // Invalid
+            "<size=123.45>test123</size>", // Invalid
+            "<size=big>test123</size>", // Invalid
+
+            // Color tag validation
+            "<color=#FFFFFF>test123</size>", // Valid
+            "<color=#000000FF>test123</size>", // Valid
+            "<color=#000000AF>test123</size>", // Valid
+            "<color=#0000009F>test123</size>", // Valid
+            "<color=#0000002F>test123</size>", // Valid
+            "<color=#00000020>test123</size>", // Invalid
+            "<color=#0000001F>test123</size>", // Invalid
+            "<color=#0000000F>test123</size>", // Invalid
+            "<color=#00000000>test123</size>", // Invalid
+
+
+            // Stray '<' - invalid and stripped before parsing the rest
+            "<test123<", 
+            "<<test123<<",
+            "<<b>test123<</b>",
+            "<<<b>test123<<</b>",
+            "<b><test123</b><",
+            "<b><<test123</b><<",
+
+            // Stray '>' - invalid and stripped before parsing the rest
+            ">test123>",
+            ">>test123>>",
+            "><b>test123></b>",
+            ">><b>test123>></b>",
+            "<b>>test123</b>>",
+            "<b>>>test123</b>>>",
+        ];
+
+        foreach (var name in names)
+        {
+            Logger.LogInfo($"Name sanitization: {name} => {SanitizeRichTextName(name)}");
+        }
     }
 
     static void SaveProfileData(CharacterFile file, int index, out AllowAnyNamesSave? saveData)
@@ -443,6 +521,186 @@ public class AllowAnyNames : BaseUnityPlugin
         return true;
     }
 
+    private static readonly StringBuilder SanitizeBuilder = new(1024);
+    private static readonly List<(int Position, int Length)> InvalidTagsCache = new(128);
+    private static readonly Stack<string> TagStack = new(128);
+    private static readonly Regex TagMatcher = new Regex("""<([^\=>]*)(?:=([^>]*))?>""", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // This deals with cleaning up / limiting rich text that is otherwise accepted by AAN
+    public static string SanitizeRichTextName(string richTextName)
+    {
+        SanitizeBuilder.Clear();
+        SanitizeBuilder.Append(richTextName);
+
+        // Pass #1: remove stray unpaired '<' and '>' characters
+
+        int lastTagStart = -1;
+
+        for (int i = 0; i < SanitizeBuilder.Length; i++)
+        {
+            if (SanitizeBuilder[i] == '<')
+            {
+                if (lastTagStart != -1)
+                {
+                    // Last '<' was junk
+                    SanitizeBuilder.Remove(lastTagStart, 1);
+                    i--;
+                }
+
+                lastTagStart = i;
+            }
+            else if (SanitizeBuilder[i] == '>')
+            {
+                if (lastTagStart == -1)
+                {
+                    // This '>' is junk
+                    SanitizeBuilder.Remove(i--, 1);
+                }
+                else
+                {
+                    lastTagStart = -1;
+                }
+            }
+        }
+
+        if (lastTagStart != -1)
+        {
+            // The very last '<' is junk since it was not closed
+            SanitizeBuilder.Remove(lastTagStart, 1);
+        }
+
+        // Pass #2: sanitize tags and enforce tags to be closed properly
+        InvalidTagsCache.Clear();
+        TagStack.Clear();
+
+        foreach (Match match in TagMatcher.Matches(SanitizeBuilder.ToString()))
+        {
+            var tagName = match.Groups[1].Value;
+            var param = match.Groups[2].Success ? match.Groups[2].Value : null;
+
+            static bool ValidateParam([NotNullWhen(true)] string? param)
+            {
+                if (param == null)
+                    return false;
+
+                for (int i = 0; i < param.Length; i++)
+                {
+                    if (char.IsWhiteSpace(param[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            static bool ValidateColor(string? param)
+            {
+                if (!ValidateParam(param))
+                    return false;
+
+                if (param.Length == 9 && param[0] == '#')
+                {
+                    var firstNibble = char.ToLowerInvariant(param[7]);
+
+                    // Check that alpha is at least 0x20 by checking the first nibble
+                    return '2' <= firstNibble && firstNibble <= '9' || 'a' <= firstNibble && firstNibble <= 'f';
+                }
+
+                return true;
+            }
+
+            static bool ValidateSize(string? param) => ValidateParam(param) && int.TryParse(param, out var size) && 8 <= size && size <= 30;
+
+            bool isValid = tagName switch
+            {
+                "align" => false,
+                "allcaps" => true,
+                "alpha" => false,
+                "b" => true,
+                "br" => false,
+                "color" => ValidateColor(param),
+                "cspace" => false,
+                "font" => true,
+                "font-weight" => true,
+                "gradient" => false,
+                "i" => true,
+                "indent" => false,
+                "line-height" => false,
+                "link" => false,
+                "lowercase" => true,
+                "margin" => false,
+                "mark" => false,
+                "mspace" => true,
+                "nobr" => false,
+                "noparse" => true,
+                "page" => false,
+                "pos" => false,
+                "rotate" => true,
+                "s" => true,
+                "size" => ValidateSize(param),
+                "smallcaps" => true,
+                "space" => false,
+                "sprite" => false,
+                "style" => false,
+                "sub" => true,
+                "sup" => true,
+                "u" => true,
+                "uppercase" => true,
+                "voffset" => false,
+                "width" => false,
+                // Disallow other opening tags
+                _ => tagName.Length > 0 && tagName[0] == '/'
+            };
+
+            if (isValid)
+            {
+                if (tagName.StartsWith('/'))
+                {
+                    if (TagStack.TryPeek(out var lastTag) && tagName.AsSpan()[1..].Equals(lastTag.AsSpan(), StringComparison.InvariantCulture))
+                    {
+                        TagStack.Pop();
+                    }
+                    else
+                    {
+                        isValid = false;
+                    }
+                }
+                else
+                {
+                    TagStack.Push(tagName);
+                }
+            }
+
+            if (!isValid)
+            {
+                InvalidTagsCache.Add(new()
+                {
+                    Position = match.Index,
+                    Length = match.Length
+                });
+            }
+        }
+
+        int positionOffset = 0;
+
+        for (int i = 0; i < InvalidTagsCache.Count; i++)
+        {
+            var (Position, Length) = InvalidTagsCache[i];
+
+            SanitizeBuilder.Remove(Position - positionOffset, Length);
+            positionOffset += Length;
+        }
+
+        // Pass #3: close all remaining tags forcefully
+        while (TagStack.TryPop(out var tag))
+        {
+            SanitizeBuilder.Append("</").Append(tag).Append('>');
+        }
+
+        return SanitizeBuilder.ToString();
+    }
+
     public static string StripToVanillaName(string richText)
     {
         const int MaxVanillaNameLength = 18;
@@ -468,21 +726,6 @@ public class AllowAnyNames : BaseUnityPlugin
         return vanillaStripped;
     }
 
-    public static string GetPlayerRichTextName(Player player)
-    {
-        if (player == null)
-            return NullAAN;
-
-        if (player == Player._mainPlayer)
-            return CustomSaveData.TryGetValue(ProfileDataManager._current.SelectedFileIndex, out var modData) ? modData.RichTextName : player._nickname;
-
-        if (MultiplayerData.TryGetValue(player.netId, out var data))
-            return data.CustomName;
-
-        // Fall back to default nickname
-        return player._nickname;
-    }
-
     internal static int GetFileIndex(CharacterFile file)
     {
         var files = ProfileDataManager._current._characterFiles;
@@ -496,13 +739,40 @@ public class AllowAnyNames : BaseUnityPlugin
         return -1;
     }
 
-    internal static string GetCharacterRichTextName(CharacterFile player)
+    public static string GetPlayerRichTextName(Player player)
+    {
+        if (player == null)
+            return NullAAN;
+
+        if (player == Player._mainPlayer)
+            return CustomSaveData.TryGetValue(ProfileDataManager._current.SelectedFileIndex, out var modData) ? modData.SanitizedRichTextName : player._nickname;
+
+        if (MultiplayerData.TryGetValue(player.netId, out var data))
+            return data.SanitizedCustomName;
+
+        // Fall back to default nickname
+        return player._nickname;
+    }
+
+    internal static string GetRawCharacterRichTextName(CharacterFile player)
     {
         if (player == null)
             return NullAAN;
 
         if (CustomSaveData.TryGetValue(GetFileIndex(player), out var saveData))
             return saveData.RichTextName;
+
+        // Fall back to default nickname
+        return player._nickName;
+    }
+
+    internal static string GetCharacterRichTextName(CharacterFile player)
+    {
+        if (player == null)
+            return NullAAN;
+
+        if (CustomSaveData.TryGetValue(GetFileIndex(player), out var saveData))
+            return saveData.SanitizedRichTextName;
 
         // Fall back to default nickname
         return player._nickName;
@@ -555,10 +825,9 @@ public class AllowAnyNames : BaseUnityPlugin
 
         MultiplayerData[nameUpdate.TargetNetId] = new()
         {
-            CustomName = nameUpdate.RichTextName,
+            SanitizedCustomName = SanitizeRichTextName(nameUpdate.RichTextName),
             LastUpdate = DateTime.Now,
         };
-        Logging.LogInfo($"Received name update! {header.SenderID} {nameUpdate.RichTextName}");
     }
 
     internal static void SendNameUpdate(uint netId, string richTextName)
@@ -572,7 +841,6 @@ public class AllowAnyNames : BaseUnityPlugin
         packet.TargetNetId = netId;
         packet.RichTextName = richTextName;
 
-        Logging.LogInfo($"Sending name update! {packet.RichTextName}");
         CodeTalkerNetwork.SendNetworkPacket(packet);
     }
 }
