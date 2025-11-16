@@ -1,6 +1,10 @@
 # Better Prism UI
 
-Adds an overlay to the health orb that indicates how much of your original Prism damage absorbtion is left.
+Adds an overlay to the health orb, party UI and world healthbars that indicate how much Prism damage absorbtion is left for a player.
+
+![](https://marioalexsan.github.io/assets/atlyss/betterprismui/absorb_orb.png)
+![](https://marioalexsan.github.io/assets/atlyss/betterprismui/party_ui.png)
+![](https://marioalexsan.github.io/assets/atlyss/betterprismui/world_healthbar.png)
 
 # Mod Compatibility
 
