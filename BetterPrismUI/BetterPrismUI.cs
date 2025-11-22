@@ -80,7 +80,7 @@ static class PartyPrismHealthUI
 
         foreach (var entry in __instance._partyDataEntries)
         {
-            var hp = entry.gameObject.GoToChild("_backdropCell/_playerStatusValuesTab/_playerHealthBar/_healthFill");
+            var hp = entry.gameObject.GoToChild("_playerStatusValuesTab/_playerHealthBar/_healthFill");
             var prismHp = GameObject.Instantiate(hp, hp.transform.parent);
             prismHp.transform.SetSiblingIndex(hp.transform.GetSiblingIndex() + 1);
 

@@ -10,7 +10,7 @@ Adds an overlay to the health orb, party UI and world healthbars that indicate h
 
 BetterPrismUI targets the following game versions and mods:
 
-- ATLYSS 102025.a5
+- ATLYSS 112025.a1
 - Multitool 1.0.0 (required dependency)
 
 Compatibility with other game versions and mods is not guaranteed, especially for updates with major changes.
