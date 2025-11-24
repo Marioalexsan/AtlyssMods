@@ -8,7 +8,7 @@
         <Product>BeyondLimitsPatcher</Product>
 
         <!-- Also set as plugin version and Thunderstore package version -->
-        <Version>3.0.0</Version>
+        <Version>3.0.1</Version>
     </PropertyGroup>
 
     <!-- Generic assembly info. -->
@@ -45,6 +45,7 @@
         <Reference Include="$(AtlyssManaged)Mirror.dll" Private="False" />
         <Reference Include="$(AtlyssManaged)com.rlabrecque.steamworks.net.dll" Private="False" />
 
+        <PackageReference Include="Nessie-EasySettings" Version="1.2.1" Private="False" />
         <PackageReference Include="ButteredLilly-ButteredLillysBeyondLimits" Version="3.0.8" Private="False" Publicize="true" />
     </ItemGroup>
 </Project>

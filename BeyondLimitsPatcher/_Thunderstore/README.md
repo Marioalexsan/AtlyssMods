@@ -2,6 +2,7 @@
 
 Patches [Buttered Lily's Beyond Limits](https://thunderstore.io/c/atlyss/p/ButteredLilly/ButteredLillysBeyondLimits/) and changes the following:
 - Removes the `<color>` attributes applied to global nicknames and character names to avoid incompatibilities with vanilla players
+- Adds a configuration option to toggle fog on / off, and reenables fog by default
 
 This mod needs to be installed alongside the original BeyondLimits mod for it to work correctly. It won't do anything useful if it's installed by itself.
 

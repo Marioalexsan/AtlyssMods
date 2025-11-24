@@ -17,6 +17,7 @@
     <ItemGroup>
         <!-- Thunderstore dependency strings -->
         <ThunderstoreDependency Include="ButteredLilly-ButteredLillysBeyondLimits-3.0.8" Visible="false" />
+        <ThunderstoreDependency Include="Nessie-EasySettings-1.2.1" Visible="false" />
         
         <!-- Output items to include from build assemblies -->
         <ThunderstoreAssemblyInclude Include="$(AssemblyName).dll" Visible="false" />
