@@ -47,7 +47,7 @@ If you need to uninstall the mod for some reason, the game should revert to a sa
 
 AllowAnyNames targets the following game versions and mods:
 
-- ATLYSS 102025.a5
+- ATLYSS 112025.a1
 - Multitool v1.0.0 (required dependency)
 - CodeYapper v2.0.0 (required dependency)
 

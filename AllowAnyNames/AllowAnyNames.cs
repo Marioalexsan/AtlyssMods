@@ -63,7 +63,7 @@ static class SendNameUpdateOnPlayerJoinedForServer
 [HarmonyPatch]
 static class HandleCharacterSelectionInputs
 {
-    static MethodInfo TargetMethod() => AccessTools.FirstMethod(typeof(CharacterSelectManager), x => x.Name.Contains("Handle_GamepadSelectionControl"));
+    static MethodInfo TargetMethod() => AccessTools.FirstMethod(typeof(CharacterSelectManager), x => x.Name.Contains("Handle_SelectionControl"));
 
     static bool Prefix(CharacterSelectManager __instance)
     {
@@ -96,6 +96,14 @@ static class HandleRenameInterface
             CreateRenameUserInteface.RenamePromptButton!.interactable = false;
             CreateRenameUserInteface.RenameButton!.interactable = true;
             CreateRenameUserInteface.ReturnButton!.interactable = true;
+
+            // TODO: Gamepad support
+            //bool usingGamepad = InputControlManager.current._setGamepadType != GamepadType.Keyboard;
+            bool usingGamepad = false;
+
+            CreateRenameUserInteface.GamepadIconInput!.enabled = usingGamepad;
+            CreateRenameUserInteface.GamepadIconConfirm!.enabled = usingGamepad;
+            CreateRenameUserInteface.GamepadIconReturn!.enabled = usingGamepad;
         }
         else
         {
@@ -114,9 +122,14 @@ static class CreateRenameUserInteface
 
     internal static MenuElement? RenameDolly;
     internal static InputField? RenameInputText;
+
     internal static Button? RenamePromptButton;
     internal static Button? RenameButton;
     internal static Button? ReturnButton;
+
+    internal static Image? GamepadIconInput;
+    internal static Image? GamepadIconConfirm;
+    internal static Image? GamepadIconReturn;
 
     static void Postfix(MainMenuManager __instance)
     {
@@ -175,6 +188,9 @@ static class CreateRenameUserInteface
         renamePrompt
             .Rename("AAN_dolly_characterRenamePrompt")
             .SaveComponentRef(ref RenameDolly)
+            .ForChild("_gamepadIco_input_deletePrompt", ico => ico.SaveComponentRef(ref GamepadIconInput))
+            .ForChild("_gamepadIco_confirm_deletePrompt", ico => ico.SaveComponentRef(ref GamepadIconConfirm))
+            .ForChild("_gamepadIco_return_deletePrompt", ico => ico.SaveComponentRef(ref GamepadIconReturn))
             .ForChild("_backdrop_deleteCharacter", backdrop =>
             {
                 backdrop
@@ -265,6 +281,11 @@ static class FixCharacterNicknames
 [HarmonyPatch]
 static class FullRichTextReplacements
 {
+    static readonly Dictionary<MethodInfo, HashSet<int>> OccurrenceMap = new()
+    {
+        [AccessTools.FirstMethod(typeof(Player), method => method.Name.Contains("Handle_NameTagDisplay"))] = [3, 4]
+    };
+
     static IEnumerable<MethodInfo> TargetMethods()
     {
         // Player _nickname
@@ -296,6 +317,9 @@ static class FullRichTextReplacements
 
         // CharacterFile _nickName
         yield return AccessTools.FirstMethod(typeof(CharacterSelectListDataEntry), method => method.Name.Contains("Handle_FilledSlotDisplay"));
+
+        foreach (var method in OccurrenceMap.Keys)
+            yield return method;
     }
 
     static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> code, MethodBase original)
@@ -318,6 +342,12 @@ static class FullRichTextReplacements
 
             occurrenceCount++;
 
+            if (OccurrenceMap.TryGetValue((MethodInfo)original, out var map) && !map.Contains(occurrenceCount))
+            {
+                matcher.Advance(1);
+                continue;
+            }
+
             if (matcher.Instruction.LoadsField(AccessTools.Field(typeof(Player), nameof(Player._nickname))))
             {
                 matcher.SetInstructionAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(AllowAnyNames), nameof(AllowAnyNames.GetPlayerRichTextName))));
@@ -326,9 +356,10 @@ static class FullRichTextReplacements
             {
                 matcher.SetInstructionAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(AllowAnyNames), nameof(AllowAnyNames.GetCharacterRichTextName))));
             }
+
+            Logging.LogDebug("Patched occurrence #" + occurrenceCount + " in " + original.Name);
         }
 
-        //Console.WriteLine("Patched " + occurrenceCount + " occurrences in " + original.Name);
 
         return matcher.InstructionEnumeration();
     }
