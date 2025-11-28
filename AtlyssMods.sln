@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeyondLimitsPatcher", "Beyo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CraptopMode", "CraptopMode\CraptopMode.csproj", "{67A4C822-0B0D-07C8-C4DA-C9AF6420EB5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AFKConfig", "AFKConfig\AFKConfig.csproj", "{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{67A4C822-0B0D-07C8-C4DA-C9AF6420EB5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67A4C822-0B0D-07C8-C4DA-C9AF6420EB5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67A4C822-0B0D-07C8-C4DA-C9AF6420EB5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
