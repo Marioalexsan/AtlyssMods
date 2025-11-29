@@ -255,13 +255,29 @@ static class CreateRenameUserInteface
         var rtfName = RenameInputText!.text;
         var saveFile = ProfileDataManager._current._characterFile;
         AllowAnyNames.SetCharacterRichTextName(rtfName, saveFile);
-        ProfileDataManager._current.Save_ProfileData();
+        QuickSaveCharacter();
     }
 
     static void RenameCharacterReturnClicked()
     {
         RenameDolly!.EnableElement(false);
         IsRenamePromptActive = false;
+    }
+    
+    static void QuickSaveCharacter()
+    {
+        // TODO: This is hacky, but we can't save on the character select otherwise
+        // FIXME: This will mark a character as new on disk, which means they'll replay the intro scene if not loaded immediately!
+
+        var previousCondition = MainMenuManager._current._mainMenuCondition;
+        var previousNewCharacter = ProfileDataManager._current._characterFile._isNewCharacter;
+
+        MainMenuManager._current._mainMenuCondition = MainMenuCondition.CharacterCreation;
+
+        ProfileDataManager._current.Save_ProfileData();
+
+        MainMenuManager._current._mainMenuCondition = previousCondition;
+        ProfileDataManager._current._characterFile._isNewCharacter = previousNewCharacter;
     }
 }
 
@@ -357,7 +373,7 @@ static class FullRichTextReplacements
                 matcher.SetInstructionAndAdvance(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(AllowAnyNames), nameof(AllowAnyNames.GetCharacterRichTextName))));
             }
 
-            Logging.LogDebug("Patched occurrence #" + occurrenceCount + " in " + original.Name);
+            //Logging.LogDebug("Patched occurrence #" + occurrenceCount + " in " + original.Name);
         }
 
 
@@ -410,6 +426,14 @@ public class AllowAnyNames : BaseUnityPlugin
     internal static HashSet<Player> Players { get; } = [];
 
     private static TimeSpan NameUpdateCooldown;
+
+    internal static Queue<string> Notices = [];
+
+    internal static void AddNotice(string msg)
+    {
+        if (Notices.Count < 5)
+            Notices.Enqueue(msg);
+    }
 
     public void Awake()
     {
@@ -502,6 +526,22 @@ public class AllowAnyNames : BaseUnityPlugin
         };
 
         CustomSaveData[index] = saveData;
+
+        bool badAANName = saveData.SanitizedRichTextName == NullAAN || saveData.SanitizedRichTextName == "Null";
+        bool badVanillaName = file._nickName == NullAAN || file._nickName == "Null";
+
+        if (badAANName && badVanillaName)
+        {
+            AddNotice($"Save number {index} had a null AAN and null vanilla name! Fix it by renaming the character.");
+        }
+        else if (badAANName)
+        {
+            AddNotice($"Save number {index} had a null AAN name! Fix it by renaming the character.");
+        }
+        else if (badVanillaName)
+        {
+            AddNotice($"Save number {index} had a null vanilla name! Fix it by renaming the character.");
+        }
     }
 
     static void DeleteProfileData(CharacterFile file, int index)
@@ -538,6 +578,12 @@ public class AllowAnyNames : BaseUnityPlugin
                     SendNameUpdate(Player._mainPlayer.netId, richText);
                 }
             }
+        }
+
+        if (Notices.Count > 0 && HostConsole._current._currentNetworkStatusTimer <= 0)
+        {
+            var msg = Notices.Dequeue();
+            HostConsole._current.Init_NetworkStatusMessage(msg);
         }
     }
 

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2025-Nov-24
+
+### Added
+
+- AAN will now display warnings if any of the characters have a null name (either "Null" or "NullAAN" for the vanilla or AAN names) 
+  - Null-named characters can be fixed by renaming them, either as part of the character select UI, or manually through editing the save files
+
+### Fixed
+
+- "Rename character" didn't actually save the vanilla file, meaning that Rich Text Name changes wouldn't be synced as a vanilla-compatible name to the vanilla save file
+  - The fix has a quirk where renamed characters might sometimes replay the game intro cinematic 
+
 ## [2.0.2] - 2025-Nov-24
 
 ### Fixed
