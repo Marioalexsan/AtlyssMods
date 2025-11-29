@@ -135,6 +135,7 @@ public class AFKConfig : BaseUnityPlugin
         {
             EasySettings.OnInitialized.AddListener(() =>
             {
+                EasySettings.AddHeader(ModInfo.NAME);
                 EasySettings.AddToggle("AFK Enabled", AFKEnabled);
                 EasySettings.AddAdvancedSlider("AFK Timer (minutes)", AFKTimer);
                 EasySettings.AddToggle("Allow Tabbing Out", AllowTabbingOut);
