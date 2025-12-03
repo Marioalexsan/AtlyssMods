@@ -9,10 +9,10 @@
         <!-- Create a package? -->
         <CreateThunderstorePackage>true</CreateThunderstorePackage>
 
-        <ThunderstorePackageName>CraptopMode</ThunderstorePackageName>
+        <ThunderstorePackageName>ChatMacros</ThunderstorePackageName>
         <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
-        <ThunderstorePackageDescription>Optimizations and configuration options for low-end PCs.</ThunderstorePackageDescription>
-        <ThunderstoreWebsite>https://github.com/Marioalexsan/AtlyssMods/</ThunderstoreWebsite>
+        <ThunderstorePackageDescription>Bind messages and commands to buttons.</ThunderstorePackageDescription>
+        <ThunderstoreWebsite>https://store.steampowered.com/app/2768430/ATLYSS/</ThunderstoreWebsite>
     </PropertyGroup>
     <ItemGroup>
         <!-- Thunderstore dependency strings -->

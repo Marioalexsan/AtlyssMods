@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CraptopMode", "CraptopMode\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AFKConfig", "AFKConfig\AFKConfig.csproj", "{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiclass", "Multiclass\Multiclass.csproj", "{46E3D10F-356B-15A1-DD43-F264DCEFC065}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatMacros", "ChatMacros\ChatMacros.csproj", "{9B16EDBB-077C-0E49-DDC0-17507161D4C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +64,14 @@ Global
 		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C9F42B6-E818-C728-03AD-D9AA7BAAF42A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46E3D10F-356B-15A1-DD43-F264DCEFC065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46E3D10F-356B-15A1-DD43-F264DCEFC065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46E3D10F-356B-15A1-DD43-F264DCEFC065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46E3D10F-356B-15A1-DD43-F264DCEFC065}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B16EDBB-077C-0E49-DDC0-17507161D4C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B16EDBB-077C-0E49-DDC0-17507161D4C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B16EDBB-077C-0E49-DDC0-17507161D4C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B16EDBB-077C-0E49-DDC0-17507161D4C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

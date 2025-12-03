@@ -9,9 +9,9 @@
         <!-- Create a package? -->
         <CreateThunderstorePackage>true</CreateThunderstorePackage>
 
-        <ThunderstorePackageName>CraptopMode</ThunderstorePackageName>
+        <ThunderstorePackageName>Multiclass</ThunderstorePackageName>
         <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
-        <ThunderstorePackageDescription>Optimizations and configuration options for low-end PCs.</ThunderstorePackageDescription>
+        <ThunderstorePackageDescription>Gain mastery over each class.</ThunderstorePackageDescription>
         <ThunderstoreWebsite>https://github.com/Marioalexsan/AtlyssMods/</ThunderstoreWebsite>
     </PropertyGroup>
     <ItemGroup>

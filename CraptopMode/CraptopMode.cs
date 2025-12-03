@@ -7,8 +7,24 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Marioalexsan.CraptopMode;
+
+//[HarmonyPatch(typeof(MenuElement), nameof(MenuElement.Init_StartElement))]
+//static class NoSlicing
+//{
+//    static void Prefix(MenuElement __instance)
+//    {
+//        var images = __instance.GetComponentsInChildren<Image>();
+
+//        for (int i = 0; i < images.Length; i++)
+//        {
+//            if (images[i].type == Image.Type.Sliced)
+//                images[i].type = Image.Type.Simple;
+//        }
+//    }
+//}
 
 [HarmonyPatch(typeof(AtlyssNetworkManager), nameof(AtlyssNetworkManager.Console_GetInput))]
 static class DisableConsoleInput
@@ -34,15 +50,7 @@ static class ItemMenuCellOptimize
 
         // Optimize: do not process unnecessary stuff if this is not the selected cell
 
-        bool tabActive = TabMenu._current._isOpen && TabMenu._current._selectedMenuCell == __instance;
-
-        for (int i = 0; i < __instance._playerRaceModelDisplays.Length; i++)
-        {
-            var display = __instance._playerRaceModelDisplays[i];
-            display.gameObject.SetActive(tabActive && __instance._mainPlayer._pVisual._playerRaceModel._scriptablePlayerRace == display._scriptablePlayerRace);
-        }
-
-        return tabActive;
+        return TabMenu._current._isOpen && TabMenu._current._selectedMenuCell == __instance;
     }
 }
 
