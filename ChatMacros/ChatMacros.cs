@@ -92,7 +92,7 @@ public class ChatMacros : BaseUnityPlugin
 
     public void Update()
     {
-        if (Enabled.Value && ChatBehaviour._current)
+        if (Enabled.Value && ChatBehaviour._current && !ChatBehaviour._current._focusedInChat && (!SettingsManager._current || !SettingsManager._current._isOpen))
         {
             int triggeredKey = -1;
 
