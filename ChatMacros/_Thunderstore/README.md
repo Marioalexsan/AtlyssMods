@@ -8,11 +8,17 @@ These options are available under `BepInEx/config/Marioalexsan.ChatMacros.cfg` o
 
 There are 9 macro buttons that can be configured, numbered from 1 to 9 as indicated by the `N` letter. For example, Macro1Button = 1st button's keycode, Macro2 = 2nd button's text, etc.
 
-| Setting      | Description                                              | Acceptable Values                           | Default Value   |
-|--------------|----------------------------------------------------------|---------------------------------------------|-----------------|
-| Enabled      | Enable or disable the key bindings for the chat macros   | `true` / `false`                            | `true`          |
-| MacroNButton | The button to use for the Nth macro                      | any key code                                | Keypad N        |
-| MacroN       | The text to send in chat when the Nth macro is triggered | any text (up to 125 characters for vanilla) | <empty>         |
+Each Macro can be optionally combined with Alt and Ctrl if `EnableAltMacros` and `EnableCtrlMacros` is enabled, allowing for up to 27 commands total.
+
+| Setting          | Description                                                        | Acceptable Values                           | Default Value |
+|------------------|--------------------------------------------------------------------|---------------------------------------------|---------------|
+| Enabled          | Enable or disable the key bindings for the chat macros             | `true` / `false`                            | `true`        |
+| EnableAltMacros  | Enables usage of Alt + Macro combinations                          | `true` / `false`                            | `false`       |
+| EnableCtrlMacros | Enables usage of Ctrl + Macro combinations                         | `true` / `false`                            | `false`       |
+| MacroNButton     | The button to use for the Nth macro                                | any key code                                | Keypad N      |
+| MacroN           | The text to send in chat when the Nth macro is triggered           | any text (up to 125 characters for vanilla) | <empty>       |
+| MacroNAlt        | The text to send in chat when the Nth macro is triggered with Alt  | any text (up to 125 characters for vanilla) | <empty>       |
+| MacroNCtrl       | The text to send in chat when the Nth macro is triggered with Ctrl | any text (up to 125 characters for vanilla) | <empty>       |
 
 # Mod Compatibility
 

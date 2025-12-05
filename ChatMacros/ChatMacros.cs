@@ -48,8 +48,15 @@ public class ChatMacros : BaseUnityPlugin
     private readonly Harmony _harmony = new Harmony($"{ModInfo.GUID}");
 
     public static ConfigEntry<bool> Enabled { get; private set; } = null!;
+    public static ConfigEntry<bool> EnableAltMacros { get; private set; } = null!;
+    public static ConfigEntry<bool> EnableCtrlMacros { get; private set; } = null!;
     public static List<ConfigEntry<string>> MacroTexts { get; private set; } = [];
+    public static List<ConfigEntry<string>> MacroAltTexts { get; private set; } = [];
+    public static List<ConfigEntry<string>> MacroCtrlTexts { get; private set; } = [];
     public static List<ConfigEntry<KeyCode>> MacroButtons { get; private set; } = [];
+
+    private static readonly List<GameObject> _altTextOptions = [];
+    private static readonly List<GameObject> _ctrlTextOptions = [];
 
     public ChatMacros()
     {
@@ -58,13 +65,17 @@ public class ChatMacros : BaseUnityPlugin
         _harmony.PatchAll();
 
         Enabled = Config.Bind("General", "Enabled", true, "Enable or disable all keybindings for this mod");
+        EnableAltMacros = Config.Bind("General", "EnableAltMacros", false, "Enables usage of Alt + Macro combinations");
+        EnableCtrlMacros = Config.Bind("General", "EnableCtrlMacros", false, "Enables usage of Ctrl + Macro combinations");
 
         for (KeyCode key = KeyCode.Keypad1; key <= KeyCode.Keypad9; key++)
         {
             int index = key - KeyCode.Keypad1 + 1;
 
-            MacroButtons.Add(Config.Bind("MacroBindings", $"Macro{index}Button", key, $"Button to press to trigger Macro {index}"));
             MacroTexts.Add(Config.Bind("MacroTexts", $"Macro{index}", "", $"Chat message or command to send when Macro {index} is triggered"));
+            MacroAltTexts.Add(Config.Bind("MacroTexts", $"Macro{index}Alt", "", $"Chat message or command to send when Macro {index} is triggered in combination with Alt"));
+            MacroCtrlTexts.Add(Config.Bind("MacroTexts", $"Macro{index}Ctrl", "", $"Chat message or command to send when Macro {index} is triggered in combination with Ctrl"));
+            MacroButtons.Add(Config.Bind("MacroBindings", $"Macro{index}Button", key, $"Button to press to trigger Macro {index}"));
         }
     }
 
@@ -76,10 +87,14 @@ public class ChatMacros : BaseUnityPlugin
             {
                 EasySettings.AddHeader(ModInfo.NAME);
                 EasySettings.AddToggle("Enabled", Enabled);
+                EasySettings.AddToggle("Enable Alt Macros", EnableAltMacros);
+                EasySettings.AddToggle("Enable Ctrl Macros", EnableCtrlMacros);
 
                 for (int i = 0; i < MacroButtons.Count; i++)
                 {
                     EasySettings.AddTextField($"Macro {i + 1}", MacroTexts[i]);
+                    _altTextOptions.Add(EasySettings.AddTextField($"Macro {i + 1} + Alt", MacroAltTexts[i]));
+                    _ctrlTextOptions.Add(EasySettings.AddTextField($"Macro {i + 1} + Ctrl", MacroCtrlTexts[i]));
                     EasySettings.AddKeyButton($"Macro {i + 1} Button", MacroButtons[i]);
                 }
             });
@@ -92,6 +107,12 @@ public class ChatMacros : BaseUnityPlugin
 
     public void Update()
     {
+        for (int i = 0; i < _altTextOptions.Count; i++)
+            _altTextOptions[i].SetActive(EnableAltMacros.Value);
+        
+        for (int i = 0; i < _ctrlTextOptions.Count; i++)
+            _ctrlTextOptions[i].SetActive(EnableCtrlMacros.Value);
+        
         if (Enabled.Value && ChatBehaviour._current && !ChatBehaviour._current._focusedInChat && (!SettingsManager._current || !SettingsManager._current._isOpen))
         {
             int triggeredKey = -1;
@@ -105,16 +126,34 @@ public class ChatMacros : BaseUnityPlugin
                 }
             }
 
-            if (triggeredKey != -1 && !string.IsNullOrWhiteSpace(MacroTexts[triggeredKey].Value))
+            if (triggeredKey != -1)
             {
-                try
+                string targetText;
+
+                if (EnableAltMacros.Value && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
                 {
-                    DisableReturnRequirement.SkipReturnCheck = true;
-                    ChatBehaviour._current.Send_ChatMessage(MacroTexts[triggeredKey].Value);
+                    targetText = MacroAltTexts[triggeredKey].Value;
                 }
-                finally
+                else if (EnableCtrlMacros.Value && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
                 {
-                    DisableReturnRequirement.SkipReturnCheck = false;
+                    targetText = MacroCtrlTexts[triggeredKey].Value;
+                }
+                else
+                {
+                    targetText = MacroTexts[triggeredKey].Value;
+                }
+
+                if (!string.IsNullOrWhiteSpace(targetText))
+                {
+                    try
+                    {
+                        DisableReturnRequirement.SkipReturnCheck = true;
+                        ChatBehaviour._current.Send_ChatMessage(targetText);
+                    }
+                    finally
+                    {
+                        DisableReturnRequirement.SkipReturnCheck = false;
+                    }
                 }
             }
         }
