@@ -5,6 +5,7 @@ using HarmonyLib;
 using Marioalexsan.ChatMacros.SoftDependencies;
 using System.Reflection.Emit;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Marioalexsan.ChatMacros;
 
@@ -57,6 +58,9 @@ public class ChatMacros : BaseUnityPlugin
 
     private static readonly List<GameObject> _altTextOptions = [];
     private static readonly List<GameObject> _ctrlTextOptions = [];
+
+    private static readonly Queue<string> _queuedCommands = [];
+    private static DateTime _lastCommandAt = DateTime.Now;
 
     public ChatMacros()
     {
@@ -112,8 +116,20 @@ public class ChatMacros : BaseUnityPlugin
         
         for (int i = 0; i < _ctrlTextOptions.Count; i++)
             _ctrlTextOptions[i].SetActive(EnableCtrlMacros.Value);
+
+        bool canTakeInputs =
+            Enabled.Value &&
+            (!ChatBehaviour._current || !ChatBehaviour._current._focusedInChat) &&
+            (!SettingsManager._current || !SettingsManager._current._isOpen) &&
+            EventSystem.current.currentSelectedGameObject == null;
+
+        if (_lastCommandAt + TimeSpan.FromMilliseconds(100) <= DateTime.Now && _queuedCommands.Count > 0)
+        {
+            _lastCommandAt = DateTime.Now;
+            SendMacro(_queuedCommands.Dequeue());
+        }
         
-        if (Enabled.Value && ChatBehaviour._current && !ChatBehaviour._current._focusedInChat && (!SettingsManager._current || !SettingsManager._current._isOpen))
+        if (canTakeInputs)
         {
             int triggeredKey = -1;
 
@@ -145,17 +161,27 @@ public class ChatMacros : BaseUnityPlugin
 
                 if (!string.IsNullOrWhiteSpace(targetText))
                 {
-                    try
+                    string[] multipleCommands = targetText.Split("&&", StringSplitOptions.RemoveEmptyEntries);
+
+                    for (int i = 0; i < multipleCommands.Length; i++)
                     {
-                        DisableReturnRequirement.SkipReturnCheck = true;
-                        ChatBehaviour._current.Send_ChatMessage(targetText);
-                    }
-                    finally
-                    {
-                        DisableReturnRequirement.SkipReturnCheck = false;
+                        _queuedCommands.Enqueue(multipleCommands[i].Trim().Replace("&amp;", "&"));
                     }
                 }
             }
+        }
+    }
+
+    private static void SendMacro(string targetText)
+    {
+        try
+        {
+            DisableReturnRequirement.SkipReturnCheck = true;
+            ChatBehaviour._current.Send_ChatMessage(targetText);
+        }
+        finally
+        {
+            DisableReturnRequirement.SkipReturnCheck = false;
         }
     }
 }

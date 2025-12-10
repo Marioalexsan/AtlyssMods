@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-Dec-10
+
+### Added
+
+- Multiple commands can now be sequenced as part of a single macro by separating them with `&&`
+  - For example, `/dance && CONGA TIME LADS` would make your character both dance and say "CONGA TIME LADS"
+  - Successive commands are sent at 100ms intervals
+  - Literal `&` characters can be escaped using `&amp;`, so you can send `&&` using `&amp;&amp;` without having it be interpreted as separate commands
+
+## Fixed
+
+- Macros no longer trigger while any event system text inputs are selected, such as the Host Console's command input
+
 ## [1.1.0] - 2025-Dec-05
 
 ### Added

@@ -10,15 +10,21 @@ There are 9 macro buttons that can be configured, numbered from 1 to 9 as indica
 
 Each Macro can be optionally combined with Alt and Ctrl if `EnableAltMacros` and `EnableCtrlMacros` is enabled, allowing for up to 27 commands total.
 
-| Setting          | Description                                                        | Acceptable Values                           | Default Value |
-|------------------|--------------------------------------------------------------------|---------------------------------------------|---------------|
-| Enabled          | Enable or disable the key bindings for the chat macros             | `true` / `false`                            | `true`        |
-| EnableAltMacros  | Enables usage of Alt + Macro combinations                          | `true` / `false`                            | `false`       |
-| EnableCtrlMacros | Enables usage of Ctrl + Macro combinations                         | `true` / `false`                            | `false`       |
-| MacroNButton     | The button to use for the Nth macro                                | any key code                                | Keypad N      |
-| MacroN           | The text to send in chat when the Nth macro is triggered           | any text (up to 125 characters for vanilla) | <empty>       |
-| MacroNAlt        | The text to send in chat when the Nth macro is triggered with Alt  | any text (up to 125 characters for vanilla) | <empty>       |
-| MacroNCtrl       | The text to send in chat when the Nth macro is triggered with Ctrl | any text (up to 125 characters for vanilla) | <empty>       |
+Multiple commands can be sent together by separating them with "&&". Each command in a sequence is queued and sent at 100ms intervals.
+For example, `/dance && CONGA TIME LADS` would make your character both dance and say "CONGA TIME LADS".
+
+If you need to send consecutive "&&" as part of the actual text without having it be interpreted as separate commands, you can do so by using "&amp;" as an escape sequence instead.
+For example, `/sit && Eepy &amp;&amp; silly` would make your character sit and say "Eepy && silly".
+
+| Setting          | Description                                                                        | Acceptable Values                           | Default Value |
+|------------------|------------------------------------------------------------------------------------|---------------------------------------------|---------------|
+| Enabled          | Enable or disable the key bindings for the chat macros                             | `true` / `false`                            | `true`        |
+| EnableAltMacros  | Enables usage of Alt + Macro combinations                                          | `true` / `false`                            | `false`       |
+| EnableCtrlMacros | Enables usage of Ctrl + Macro combinations                                         | `true` / `false`                            | `false`       |
+| MacroNButton     | The button to use for the Nth macro                                                | any key code                                | Keypad N      |
+| MacroN           | The text to send in chat when the Nth macro is triggered                           | any text (up to 125 characters for vanilla) | <empty>       |
+| MacroNAlt        | The text to send in chat when the Nth macro is triggered with Alt                  | any text (up to 125 characters for vanilla) | <empty>       |
+| MacroNCtrl       | The text to send in chat when the Nth macro is triggered with Ctrl                 | any text (up to 125 characters for vanilla) | <empty>       |
 
 # Mod Compatibility
 
