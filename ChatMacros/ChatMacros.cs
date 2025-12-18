@@ -119,7 +119,8 @@ public class ChatMacros : BaseUnityPlugin
 
         bool canTakeInputs =
             Enabled.Value &&
-            (!ChatBehaviour._current || !ChatBehaviour._current._focusedInChat) &&
+            ChatBehaviour._current &&
+            !ChatBehaviour._current._focusedInChat &&
             (!SettingsManager._current || !SettingsManager._current._isOpen) &&
             EventSystem.current.currentSelectedGameObject == null;
 
@@ -174,6 +175,9 @@ public class ChatMacros : BaseUnityPlugin
 
     private static void SendMacro(string targetText)
     {
+        if (!ChatBehaviour._current)
+            return;
+        
         try
         {
             DisableReturnRequirement.SkipReturnCheck = true;
