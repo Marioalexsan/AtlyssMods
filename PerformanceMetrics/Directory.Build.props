@@ -1,0 +1,26 @@
+<Project>
+    <!-- Specify here the path to ATLYSS's install folder -->
+    <PropertyGroup>
+        <AtlyssPath>D:\SteamLibrary\steamapps\common\ATLYSS\</AtlyssPath>
+    </PropertyGroup>
+
+    <!-- Thunderstore configuration -->
+    <PropertyGroup>
+        <!-- Create a package? -->
+        <CreateThunderstorePackage>true</CreateThunderstorePackage>
+
+        <ThunderstorePackageName>PerformanceMetrics</ThunderstorePackageName>
+        <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
+        <ThunderstorePackageDescription>Displays Unity's performance metrics in-game (memory, CPU usage, etc.)</ThunderstorePackageDescription>
+        <ThunderstoreWebsite>https://store.steampowered.com/app/2768430/ATLYSS/</ThunderstoreWebsite>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Thunderstore dependency strings -->
+        <ThunderstoreDependency Include="BepInEx-BepInExPack-5.4.2100" Visible="false" />
+        <!--<ThunderstoreDependency Include="Nessie-EasySettings-1.1.8" Visible="false" />-->
+        
+        <!-- Output items to include from build assemblies -->
+        <ThunderstoreAssemblyInclude Include="$(AssemblyName).dll" Visible="false" />
+        <!--<ThunderstoreAssemblyInclude Include="UnityEngine.UIModule.dll" Visible="false" />-->
+    </ItemGroup>
+</Project>

@@ -311,7 +311,6 @@ static class FullRichTextReplacements
         yield return AccessTools.FirstMethod(typeof(StatsMenuCell), method => method.Name.Contains("Handle_StatCounterDisplays"));
         yield return AccessTools.Method(typeof(WhoMenuCell), nameof(WhoMenuCell.Init_MutePeer));
         yield return AccessTools.Method(typeof(WhoListDataEntry), nameof(WhoListDataEntry.Handle_WhoDataEntry));
-        yield return AccessTools.Method(typeof(ChatBehaviour), nameof(ChatBehaviour.On_ChannelSwitch));
         yield return AccessTools.Method(typeof(ChatBehaviour), nameof(ChatBehaviour.UserCode_Cmd_SendChatMessage__String__ChatChannel));
         yield return AccessTools.Method(typeof(ChatBehaviour), nameof(ChatBehaviour.UserCode_Rpc_RecieveChatMessage__String__Boolean__ChatChannel));
 
