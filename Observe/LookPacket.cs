@@ -1,0 +1,53 @@
+﻿using System.Buffers.Binary;
+using CodeTalker.Packets;
+using UnityEngine;
+
+namespace Marioalexsan.Observe;
+
+internal class LookPacket : BinaryPacketBase
+{
+    private const string Signature = $"{ModInfo.GUID}.{nameof(LookPacket)}";
+    public override string PacketSignature => Signature;
+
+    public Quaternion CameraRotation;
+    public uint TargetNetId;
+    public bool IgnoreCamera;
+    
+    public bool IsValid = true;
+    
+    public override byte[] Serialize()
+    {
+        var data = new byte[32]; // Extra padding with zeroes - might be useful for future versions
+        var span = data.AsSpan();
+
+        BinaryPrimitives.TryWriteInt32LittleEndian(span, BitConverter.SingleToInt32Bits(CameraRotation.x));
+        BinaryPrimitives.TryWriteInt32LittleEndian(span[4..], BitConverter.SingleToInt32Bits(CameraRotation.y));
+        BinaryPrimitives.TryWriteInt32LittleEndian(span[8..], BitConverter.SingleToInt32Bits(CameraRotation.z));
+        BinaryPrimitives.TryWriteInt32LittleEndian(span[12..], BitConverter.SingleToInt32Bits(CameraRotation.w));
+        BinaryPrimitives.TryWriteUInt32LittleEndian(span[16..], TargetNetId);
+        BitConverter.TryWriteBytes(span[17..], IgnoreCamera);
+
+        return data;
+    }
+
+    public override void Deserialize(byte[] data)
+    {
+        // Current version packets should have at least 32 bytes if they're okay
+        if (data.Length < 32)
+        {
+            IsValid = false;
+            return;
+        }
+        
+        var span = data.AsSpan();
+
+        CameraRotation.x = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(span));
+        CameraRotation.y = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(span[4..]));
+        CameraRotation.z = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(span[8..]));
+        CameraRotation.w = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(span[12..]));
+        TargetNetId = BinaryPrimitives.ReadUInt32LittleEndian(span[16..]);
+        IgnoreCamera = BitConverter.ToBoolean(span[17..]);
+    }
+
+    public static readonly LookPacket Instance = new();
+}

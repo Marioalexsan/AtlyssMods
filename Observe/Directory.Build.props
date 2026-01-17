@@ -9,15 +9,16 @@
         <!-- Create a package? -->
         <CreateThunderstorePackage>true</CreateThunderstorePackage>
 
-        <ThunderstorePackageName>ChatMacros</ThunderstorePackageName>
+        <ThunderstorePackageName>Observe</ThunderstorePackageName>
         <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
-        <ThunderstorePackageDescription>Bind messages and commands to buttons.</ThunderstorePackageDescription>
+        <ThunderstorePackageDescription>Have your character look where you're looking.</ThunderstorePackageDescription>
         <ThunderstoreWebsite>https://github.com/Marioalexsan/AtlyssMods/</ThunderstoreWebsite>
     </PropertyGroup>
     <ItemGroup>
         <!-- Thunderstore dependency strings -->
         <ThunderstoreDependency Include="BepInEx-BepInExPack-5.4.2100" Visible="false" />
         <ThunderstoreDependency Include="Nessie-EasySettings-1.2.1" Visible="false" />
+        <ThunderstoreDependency Include="Soggy_Pancake-CodeYapper-2.1.0" Visible="false" />
         
         <!-- Output items to include from build assemblies -->
         <ThunderstoreAssemblyInclude Include="$(AssemblyName).dll" Visible="false" />
