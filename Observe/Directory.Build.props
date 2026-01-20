@@ -11,7 +11,7 @@
 
         <ThunderstorePackageName>Observe</ThunderstorePackageName>
         <ThunderstoreTeamName>Marioalexsan</ThunderstoreTeamName>
-        <ThunderstorePackageDescription>Have your character look where you're looking.</ThunderstorePackageDescription>
+        <ThunderstorePackageDescription>Enhance your character with custom head directions and poses.</ThunderstorePackageDescription>
         <ThunderstoreWebsite>https://github.com/Marioalexsan/AtlyssMods/</ThunderstoreWebsite>
     </PropertyGroup>
     <ItemGroup>

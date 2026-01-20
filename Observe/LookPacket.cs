@@ -11,7 +11,10 @@ internal class LookPacket : BinaryPacketBase
 
     public Quaternion CameraRotation;
     public uint TargetNetId;
-    public bool IgnoreCamera;
+    public bool VanillaMode;
+    public bool OwlMode;
+    public LookSpeed LookSpeed;
+    public LookDirection OverrideDirection; // Only used for secondary behaviour!
     
     public bool IsValid = true;
     
@@ -25,7 +28,12 @@ internal class LookPacket : BinaryPacketBase
         BinaryPrimitives.TryWriteInt32LittleEndian(span[8..], BitConverter.SingleToInt32Bits(CameraRotation.z));
         BinaryPrimitives.TryWriteInt32LittleEndian(span[12..], BitConverter.SingleToInt32Bits(CameraRotation.w));
         BinaryPrimitives.TryWriteUInt32LittleEndian(span[16..], TargetNetId);
-        BitConverter.TryWriteBytes(span[17..], IgnoreCamera);
+        BitConverter.TryWriteBytes(span[20..], VanillaMode);
+        
+        // Added in 1.1.0
+        BitConverter.TryWriteBytes(span[21..], OwlMode);
+        span[22] = (byte)LookSpeed;
+        span[23] = (byte)OverrideDirection;
 
         return data;
     }
@@ -46,7 +54,12 @@ internal class LookPacket : BinaryPacketBase
         CameraRotation.z = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(span[8..]));
         CameraRotation.w = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(span[12..]));
         TargetNetId = BinaryPrimitives.ReadUInt32LittleEndian(span[16..]);
-        IgnoreCamera = BitConverter.ToBoolean(span[17..]);
+        VanillaMode = BitConverter.ToBoolean(span[20..]);
+        
+        // Added in 1.1.0
+        OwlMode = BitConverter.ToBoolean(span[21..]);
+        LookSpeed = (LookSpeed)span[22];
+        OverrideDirection = (LookDirection)span[23];
     }
 
     public static readonly LookPacket Instance = new();

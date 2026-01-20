@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-Jan-18
+
+### Added
+
+- Added chat commands that change where and how your character looks, as well as various settings
+    - `/observe default` resets back to default behaviour (i.e. look in line with the camera)
+    - `/observe pose [seconds]` makes your character look in your current direction for that many seconds, if
+      specified
+      - the pose is relative to the body, i.e. moving around will keep the relative direction
+    - `/observe <direction> [seconds]` poses in the given relative direction, similar to `/observe pose`
+      - available values are `left`, `right`, `up`, `down`, `forward`, and `backward`
+    - `/observe camera [seconds]` makes your character look *towards* your camera instead of in line with it for that
+      many seconds, if specified
+    - `/observe environment [seconds]` makes your character look at the environment in the given direction for that many
+      seconds, if specified
+      - moving around will make the head rotate to face the set direction
+    - `/observe owl` toggles Owl Mode on / off
+    - `/observe speed <setting>` sets the speed at which your character rotates their head
+    - `/observe vanilla` toggles Vanilla Mode on / off (previously this was the Ignore Camera setting)
+- Added settings to configure the rotation constraints for character heads:
+    - the `OwlMode` setting allows your character to face any direction (toggled off by default)
+    - the `AllowOwlModeForOthers` setting allows other characters that use `OwlMode` to display their head rotations
+      unconstrained (toggled on by default)
+        - if disabled, their rotations will be constrained even if they have it specified
+    - while `OwlMode` is active, eye states are not used to display far angles that can't be "reached" with normal
+      rotations
+- Added the `LookSpeed` setting that defines how fast the character's head responds to direction changes
+    - available options are `Sloth`, `VerySlow`, `Slow`, `Normal`, `Fast`, `VeryFast` and `Caffeinated`
+    - each player uses their own look speed
+- Added the `HoldHeadDirectionAfterStrafing` setting (on by default); this acts as if you were to use
+  `/observe environment` while in strafe mode
+    - The duration can be controlled with `HoldHeadDirectionAfterStrafingDuration` (4 second by default, 120 seconds max)
+
+### Changed
+
+- While in freecam mode or in a dialogue, the character will now temporarily avoid using the camera and instead look forward
+  - Currently only Homebrewery's freecam mode is supported
+- `IgnoreCamera` setting was renamed to `VanillaMode`
+    - It will now generally disable this mod's functionality for your character, making them act as in vanilla
+
+### Fixed
+
+- Fixed head rotations being applied incorrectly to left handed characters
+- Fixed a packet serialization issue that would override parts of player NetIDs and cause packets to be dropped for
+  players if they don't join early enough, meaning you couldn't see other player's head rotations
+
+## [1.0.1] - 2026-Jan-19
+
+### Fixed
+
+- Removed leftover info logs for packets sent / received
+
 ## [1.0.0] - 2026-Jan-17
 
 **Initial mod release**
