@@ -289,7 +289,8 @@ public class ObservePlugin : BaseUnityPlugin
             
                 foreach (var player in Players)
                 {
-                    if (player != Player._mainPlayer)
+                    // Only send to other players that have valid SteamIDs to avoid log errors from CodeYapper
+                    if (player != Player._mainPlayer && ulong.TryParse(player.Network_steamID, out _))
                         CodeTalkerNetwork.SendNetworkPacket(player, LookPacket.Instance);
                 }
             }

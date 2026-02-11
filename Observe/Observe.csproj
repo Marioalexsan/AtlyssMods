@@ -8,7 +8,7 @@
         <Product>Observe</Product>
 
         <!-- Also set as plugin version and Thunderstore package version -->
-        <Version>1.1.1</Version>
+        <Version>1.1.2</Version>
     </PropertyGroup>
 
     <!-- Generic assembly info. -->
