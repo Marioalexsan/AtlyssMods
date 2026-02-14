@@ -20,6 +20,8 @@ under [EasySettings](https://thunderstore.io/c/atlyss/p/Nessie/EasySettings/)'s 
 | LookSpeed                              | The speed at which your character reacts to changes in direction.                                           | `Sloth`, `VerySlow`, `Slow`, `Normal`, `Fast`, `VeryFast`, `Caffeinated` | `Normal`      |
 | HoldHeadDirectionAfterStrafing         | Enable to keep looking at the given direction after strafing as if you used "/observe environment"          | `true` / `false`                                                         | `true`        |
 | HoldHeadDirectionAfterStrafingDuration | How long to continue looking at the environment when HoldHeadDirectionAfterStrafing is enabled, in seconds. | min: `0`. max: `120` (seconds)                                           | `4` (seconds) |
+| LookAtInteractables                    | Have your character look at interactable objects if not already posing.                                     | `true` / `false`                                                         | `true`        |
+| LookAtNPCDuringDialogue                | Have your character look at NPCs during dialogue if not already posing.                                     | `true` / `false`                                                         | `true`        |
 
 # Look modes
 
@@ -38,6 +40,7 @@ There are four main look modes used by the mod:
 - By default, your character's rotation range is restricted. Owl Mode allows full rotations, but this might make it look like the character snapped their neck.
   - You can control whenever you can see other people's Owl Mode setting with the `AllowOwlModeForOthers` configuration option.
 - When strafing, if `HoldHeadDirectionAfterStrafing` is set, then the character will act as if you used `/observe environment [duration]` with HoldHeadDirectionAfterStrafingDuration as the duration
+- While in `Default` mode, if you set `LookAtInteractables` and `LookAtNPCDuringDialogue`, then your character will look at interactables / NPCs if applicable instead of looking in line with the camera
 
 # Commands
 
@@ -56,10 +59,16 @@ There are four main look modes used by the mod:
 
 Observe targets the following game versions and mods:
 
-- ATLYSS 12026.a3
-- Soggy's CodeYapper v2.1.0
-- Soggy's AtlyssCommandLib v0.0.7
-- Nessie's EasySettings v1.2.1 (optional dependency used for configuration)
-- Catman's Homebrewery v4.7.3 (optional; interacts with its freecam setting)
+- v1.1.1 - v1.2.0
+  - ATLYSS 12026.a3
+  - Soggy's CodeYapper v2.1.0
+  - Soggy's AtlyssCommandLib v0.0.7
+  - Nessie's EasySettings v1.2.1 (optional, used for configuration)
+  - Catman's Homebrewery v4.7.3 (optional, interacts with its freecam setting)
+- v1.0.0 - v1.1.0
+  - ATLYSS 12026.a3
+  - Soggy's CodeYapper v2.1.0
+  - Nessie's EasySettings v1.2.1 (optional, used for configuration)
+  - Catman's Homebrewery v4.7.3 (optional, interacts with its freecam setting)
 
 Compatibility with other game versions and mods is not guaranteed, especially for updates with major changes.

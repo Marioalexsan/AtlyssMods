@@ -8,7 +8,7 @@
         <Product>Observe</Product>
 
         <!-- Also set as plugin version and Thunderstore package version -->
-        <Version>1.1.2</Version>
+        <Version>1.2.0</Version>
     </PropertyGroup>
 
     <!-- Generic assembly info. -->
@@ -46,7 +46,7 @@
         <Reference Include="$(AtlyssManaged)com.rlabrecque.steamworks.net.dll" Private="False" />
 
         <!-- Reference mod packages from Thunderstore like this (works as if it's a NuGet package): -->
-        <PackageReference Include="Nessie-EasySettings" Version="1.2.1" Private="False" />
+        <PackageReference Include="Nessie-EasySettings" Version="1.3.0" Private="False" />
         <PackageReference Include="Soggy_Pancake-CodeYapper" Version="2.1.0" Private="False" />
         <PackageReference Include="Soggy_Pancake-AtlyssCommandLib" Version="0.0.7" Private="False" />
         <PackageReference Include="Catman232-Homebrewery" Version="4.7.3" Private="False" Publicize="true" />

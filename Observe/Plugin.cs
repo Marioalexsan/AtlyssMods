@@ -53,6 +53,9 @@ public class ObservePlugin : BaseUnityPlugin
     internal static ConfigEntry<LookSpeed> LookSpeedSetting = null!;
     internal static ConfigEntry<bool> HoldHeadDirectionAfterStrafing = null!;
     internal static ConfigEntry<float> HoldHeadDirectionAfterStrafingDuration = null!;
+    
+    internal static ConfigEntry<bool> LookAtInteractables = null!;
+    internal static ConfigEntry<bool> LookAtNPCDuringDialogue = null!;
 
     private bool _lastSendEnableState = false;
     private bool _shouldSendCurrentState = false;
@@ -77,6 +80,8 @@ public class ObservePlugin : BaseUnityPlugin
         LookSpeedSetting = Config.Bind("Display", "LookSpeed", LookSpeed.Normal, "The speed at which your character reacts to changes in direction.");
         HoldHeadDirectionAfterStrafing = Config.Bind("Controls", "HoldHeadDirectionAfterStrafing", true, "Enable to keep looking at the given direction after strafing as if you used \"/observe environment\".");
         HoldHeadDirectionAfterStrafingDuration = Config.Bind("Controls", "HoldHeadDirectionAfterStrafingDuration", 4f, new ConfigDescription("How long to continue looking at the environment when HoldHeadDirectionAfterStrafing is enabled, in seconds.", new AcceptableValueRange<float>(0, 120)));
+        LookAtInteractables = Config.Bind("FunStuff", "LookAtInteractables", true, "Have your character look at interactable objects if not already posing.");
+        LookAtNPCDuringDialogue = Config.Bind("FunStuff", "LookAtNPCDuringDialogue", true, "Have your character look at NPCs during dialogue if not already posing.");
     }
 
     private void Awake()
@@ -130,15 +135,20 @@ public class ObservePlugin : BaseUnityPlugin
         {
             Settings.OnInitialized.AddListener(() =>
             {
-                Settings.ModTab.AddHeader("Observe");
-                Settings.ModTab.AddToggle("Enabled", Enabled);
-                Settings.ModTab.AddToggle("Ignore Camera (self)", VanillaModeSetting);
-                Settings.ModTab.AddToggle("Enable Networking", EnableNetworking);
-                Settings.ModTab.AddToggle("Owl Mode (full rotations)", OwlModeSetting);
-                Settings.ModTab.AddToggle("Allow Owl Mode for others", AllowOwlModeForOthers);
-                Settings.ModTab.AddDropdown("Look speed", LookSpeedSetting);
-                Settings.ModTab.AddToggle("Hold head direction after strafing", HoldHeadDirectionAfterStrafing);
-                Settings.ModTab.AddAdvancedSlider("Strafe hold head direction duration", HoldHeadDirectionAfterStrafingDuration, true);
+                var observeTab = Settings.GetOrAddCustomTab("Observe");
+
+                observeTab.AddHeader("General");
+                observeTab.AddToggle("Enabled", Enabled);
+                observeTab.AddToggle("Ignore Camera (self)", VanillaModeSetting);
+                observeTab.AddToggle("Enable Networking", EnableNetworking);
+                observeTab.AddToggle("Owl Mode (full rotations)", OwlModeSetting);
+                observeTab.AddToggle("Allow Owl Mode for others", AllowOwlModeForOthers);
+                observeTab.AddDropdown("Look speed", LookSpeedSetting);
+                observeTab.AddToggle("Hold head direction after strafing", HoldHeadDirectionAfterStrafing);
+                observeTab.AddAdvancedSlider("Strafe hold duration", HoldHeadDirectionAfterStrafingDuration, true);
+                observeTab.AddHeader("Fun stuff");
+                observeTab.AddToggle("Look at highlighted items", LookAtInteractables);
+                observeTab.AddToggle("Look at highlighted NPCs", LookAtNPCDuringDialogue);
             });
             Settings.OnApplySettings.AddListener(() =>
             {
@@ -422,14 +432,37 @@ public class ObservePlugin : BaseUnityPlugin
             case LookDirection.Camera:
                 if (cameraDisabled)
                     return headTransform.rotation;
+                
                 return Quaternion.LookRotation(-CameraFunction._current.transform.forward, player.transform.up);
             case LookDirection.Pose:
                 return headTransform.parent.rotation * SavedOverride;
             case LookDirection.Environment:
                 return SavedOverride;
             default:
+                if (LookAtNPCDuringDialogue.Value)
+                {
+                    if (DialogManager._current._isDialogEnabled && DialogManager._current._cachedNpc)
+                    {
+                        var lookAt = DialogManager._current._cachedNpc.transform.position;
+
+                        var headBone = GetHeadBone(DialogManager._current._cachedNpc);
+
+                        if (headBone != null)
+                            lookAt = headBone.position;
+                        
+                        return Quaternion.LookRotation(lookAt - player.transform.position, player.transform.up);
+                    }
+                }
+                
+                if (LookAtInteractables.Value)
+                {
+                    if (player.TryGetComponent(out PlayerInteract playerInteract) && playerInteract._interactReticleObject && playerInteract._interactReticleObject.gameObject.activeSelf)
+                        return Quaternion.LookRotation(playerInteract._interactReticleObject.position - player.transform.position, player.transform.up);
+                }
+                
                 if (cameraDisabled)
                     return headTransform.rotation;
+
                 // Look in line with camera if no overrides are specified
                 return CameraFunction._current.transform.rotation;
         }
@@ -447,15 +480,16 @@ public class ObservePlugin : BaseUnityPlugin
 
     internal static Transform? GetHeadBone(PlayerRaceModel raceModel)
     {
-        return raceModel._armatureTransform
-            ?.Find("Armature_character")
-            ?.Find("masterBone")
-            ?.Find("hipCtrl")
-            ?.Find("hip")
-            ?.Find("lowBody")
-            ?.Find("midBody")
-            ?.Find("torso")
-            ?.Find("neck")
-            ?.Find("head");
+        return raceModel._armatureTransform?.Find("Armature_character/masterBone/hipCtrl/hip/lowBody/midBody/torso/neck/head");
+    }
+
+    internal static Transform? GetHeadBone(NetNPC npc)
+    {
+        var meshRender = npc.GetComponentInChildren<SkinnedMeshRenderer>();
+        
+        if (!meshRender)
+            return null;
+
+        return meshRender.rootBone.Find("hipCtrl/hip/lowBody/midBody/torso/neck/head");
     }
 }

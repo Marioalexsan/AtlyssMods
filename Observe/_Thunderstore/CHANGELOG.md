@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-Feb-15
+
+### Added
+
+- `LookAtInteractables` sets whenever the character should look at interactables in Default mode (`true` by default)
+- `LookAtNPCDuringDialogue` sets whenever the character should look at NPCs during dialogue in Default mode (`true` by default)
+  - For NPCs with a head, the character will try to look at it; otherwise, it will look at the character's center 
+
+### Changed
+
+- Updated to EasySettings 1.3.0 and moved Observe settings to a dedicated tab
+
 ## [1.1.2] - 2026-Jan-20
 
 ### Fixed
