@@ -2,8 +2,10 @@
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using Marioalexsan.ChatMacros.SoftDependencies;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using BepInEx.Bootstrap;
+using Nessie.ATLYSS.EasySettings;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -38,7 +40,7 @@ static class DisableReturnRequirement
 }
 
 [BepInPlugin(ModInfo.GUID, ModInfo.NAME, ModInfo.VERSION)]
-[BepInDependency(EasySettings.ModID, BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("EasySettings", BepInDependency.DependencyFlags.SoftDependency)]
 public class ChatMacros : BaseUnityPlugin
 {
     public static ChatMacros Plugin => _plugin ?? throw new InvalidOperationException($"{nameof(ChatMacros)} hasn't been initialized yet. Either wait until initialization, or check via ChainLoader instead.");
@@ -85,30 +87,37 @@ public class ChatMacros : BaseUnityPlugin
 
     public void Awake()
     {
-        if (EasySettings.IsAvailable)
+        if (Chainloader.PluginInfos.ContainsKey("EasySettings"))
         {
-            EasySettings.OnInitialized.AddListener(() =>
+            SetupEasySettings();
+            
+            [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+            void SetupEasySettings()
             {
-                EasySettings.AddHeader(ModInfo.NAME);
-                EasySettings.AddToggle("Enabled", Enabled);
-                EasySettings.AddToggle("Enable Alt Macros", EnableAltMacros);
-                EasySettings.AddToggle("Enable Ctrl Macros", EnableCtrlMacros);
-
-                for (int i = 0; i < MacroButtons.Count; i++)
+                Settings.OnInitialized.AddListener(() =>
                 {
-                    EasySettings.AddTextField($"Macro {i + 1}", MacroTexts[i]);
-                    _altTextOptions.Add(EasySettings.AddTextField($"Macro {i + 1} + Alt", MacroAltTexts[i]));
-                    _ctrlTextOptions.Add(EasySettings.AddTextField($"Macro {i + 1} + Ctrl", MacroCtrlTexts[i]));
-                    EasySettings.AddKeyButton($"Macro {i + 1} Button", MacroButtons[i]);
-                }
-            });
-            EasySettings.OnApplySettings.AddListener(() =>
-            {
-                Config.Save();
-            });
+                    var tab = Settings.GetOrAddCustomTab("ChatMacros");
+                    
+                    tab.AddToggle("Enabled", Enabled);
+                    tab.AddToggle("Enable Alt Macros", EnableAltMacros);
+                    tab.AddToggle("Enable Ctrl Macros", EnableCtrlMacros);
+
+                    for (int i = 0; i < MacroButtons.Count; i++)
+                    {
+                        tab.AddTextField($"Macro {i + 1}", MacroTexts[i]);
+                        _altTextOptions.Add(tab.AddTextField($"Macro {i + 1} + Alt", MacroAltTexts[i]).Root.gameObject);
+                        _ctrlTextOptions.Add(tab.AddTextField($"Macro {i + 1} + Ctrl", MacroCtrlTexts[i]).Root.gameObject);
+                        tab.AddKeyButton($"Macro {i + 1} Button", MacroButtons[i]);
+                    }
+                });
+                Settings.OnApplySettings.AddListener(() =>
+                {
+                    Config.Save();
+                });
+            }
         }
     }
-
+    
     public void Update()
     {
         for (int i = 0; i < _altTextOptions.Count; i++)

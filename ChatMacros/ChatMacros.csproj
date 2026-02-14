@@ -8,7 +8,7 @@
         <Product>ChatMacros</Product>
 
         <!-- Also set as plugin version and Thunderstore package version -->
-        <Version>1.2.1</Version>
+        <Version>1.2.2</Version>
     </PropertyGroup>
 
     <!-- Generic assembly info. -->
@@ -44,8 +44,7 @@
         <Reference Include="$(AtlyssManaged)Newtonsoft.Json.dll" Private="False" />
         <Reference Include="$(AtlyssManaged)Mirror.dll" Private="False" />
         <Reference Include="$(AtlyssManaged)com.rlabrecque.steamworks.net.dll" Private="False" />
-        
-        <PackageReference Include="Nessie-EasySettings" Version="1.2.1" Private="False" />
-        
+
+        <PackageReference Include="Nessie-EasySettings" Version="1.3.0" Private="False" />
     </ItemGroup>
 </Project>

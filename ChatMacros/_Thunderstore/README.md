@@ -30,7 +30,11 @@ For example, `/sit && Eepy &amp;&amp; silly` would make your character sit and s
 
 ChatMacros targets the following game versions and mods:
 
-- ATLYSS 112025.a4
-- Nessie's EasySettings v1.2.1 (optional dependency used for configuration)
+- v1.0.0 through v1.2.1
+  - ATLYSS 112025.a4
+  - [EasySettings](https://thunderstore.io/c/atlyss/p/Nessie/EasySettings/) v1.2.1 (optional, used for configuration)
+- v1.2.2
+  - ATLYSS 12026.a3
+  - [EasySettings](https://thunderstore.io/c/atlyss/p/Nessie/EasySettings/) v1.3.0 (optional, used for configuration)
 
 Compatibility with other game versions and mods is not guaranteed, especially for updates with major changes.
