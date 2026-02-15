@@ -444,20 +444,26 @@ public class ObservePlugin : BaseUnityPlugin
                     if (DialogManager._current._isDialogEnabled && DialogManager._current._cachedNpc)
                     {
                         var lookAt = DialogManager._current._cachedNpc.transform.position;
+                        var lookFrom = headTransform.position;
 
-                        var headBone = GetHeadBone(DialogManager._current._cachedNpc);
+                        var npcHeadBone = GetHeadBone(DialogManager._current._cachedNpc);
 
-                        if (headBone != null)
-                            lookAt = headBone.position;
+                        if (npcHeadBone != null)
+                            lookAt = npcHeadBone.position;
                         
-                        return Quaternion.LookRotation(lookAt - player.transform.position, player.transform.up);
+                        return Quaternion.LookRotation(lookAt - lookFrom, player.transform.up);
                     }
                 }
                 
                 if (LookAtInteractables.Value)
                 {
                     if (player.TryGetComponent(out PlayerInteract playerInteract) && playerInteract._interactReticleObject && playerInteract._interactReticleObject.gameObject.activeSelf)
-                        return Quaternion.LookRotation(playerInteract._interactReticleObject.position - player.transform.position, player.transform.up);
+                    {
+                        var lookAt = playerInteract._interactReticleObject.position;
+                        var lookFrom = headTransform.position;
+                        
+                        return Quaternion.LookRotation(lookAt - lookFrom, player.transform.up);
+                    }
                 }
                 
                 if (cameraDisabled)
