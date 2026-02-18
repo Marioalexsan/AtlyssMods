@@ -11,6 +11,15 @@ using UnityEngine;
 
 namespace Marioalexsan.Observe;
 
+public enum BackwardLookMode
+{
+    FaceBehindRight,
+    FaceBehindLeft,
+    FaceCamera,
+    FaceFront,
+    NoEffect
+}
+
 [BepInPlugin(ModInfo.GUID, ModInfo.NAME, ModInfo.VERSION)]
 [BepInDependency("EasySettings", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("CodeTalker")]
@@ -53,6 +62,7 @@ public class ObservePlugin : BaseUnityPlugin
     internal static ConfigEntry<LookSpeed> LookSpeedSetting = null!;
     internal static ConfigEntry<bool> HoldHeadDirectionAfterStrafing = null!;
     internal static ConfigEntry<float> HoldHeadDirectionAfterStrafingDuration = null!;
+    internal static ConfigEntry<BackwardLookMode> BackwardLookModeSetting = null!;
     
     internal static ConfigEntry<bool> LookAtInteractables = null!;
     internal static ConfigEntry<bool> LookAtNPCDuringDialogue = null!;
@@ -66,6 +76,7 @@ public class ObservePlugin : BaseUnityPlugin
     internal static LookDirection LocalOverrideDirection = LookDirection.Default;
     internal static TimeSpan LocalOverrideDirectionTime = TimeSpan.Zero;
     internal static Quaternion SavedOverride = Quaternion.identity;
+    internal static Quaternion SavedTilt = Quaternion.identity;
 
     internal new static ManualLogSource Logger = null!;
 
@@ -80,6 +91,7 @@ public class ObservePlugin : BaseUnityPlugin
         LookSpeedSetting = Config.Bind("Display", "LookSpeed", LookSpeed.Normal, "The speed at which your character reacts to changes in direction.");
         HoldHeadDirectionAfterStrafing = Config.Bind("Controls", "HoldHeadDirectionAfterStrafing", true, "Enable to keep looking at the given direction after strafing as if you used \"/observe environment\".");
         HoldHeadDirectionAfterStrafingDuration = Config.Bind("Controls", "HoldHeadDirectionAfterStrafingDuration", 4f, new ConfigDescription("How long to continue looking at the environment when HoldHeadDirectionAfterStrafing is enabled, in seconds.", new AcceptableValueRange<float>(0, 120)));
+        BackwardLookModeSetting = Config.Bind("Display", "BackwardLookMode", BackwardLookMode.FaceBehindRight, "Configure how the character behaves in Default mode when looking at frontal angles.");
         LookAtInteractables = Config.Bind("FunStuff", "LookAtInteractables", true, "Have your character look at interactable objects if not already posing.");
         LookAtNPCDuringDialogue = Config.Bind("FunStuff", "LookAtNPCDuringDialogue", true, "Have your character look at NPCs during dialogue if not already posing.");
     }
@@ -146,6 +158,7 @@ public class ObservePlugin : BaseUnityPlugin
                 observeTab.AddDropdown("Look speed", LookSpeedSetting);
                 observeTab.AddToggle("Hold head direction after strafing", HoldHeadDirectionAfterStrafing);
                 observeTab.AddAdvancedSlider("Strafe hold duration", HoldHeadDirectionAfterStrafingDuration, true);
+                observeTab.AddDropdown("Backward look mode", BackwardLookModeSetting);
                 observeTab.AddHeader("Fun stuff");
                 observeTab.AddToggle("Look at highlighted items", LookAtInteractables);
                 observeTab.AddToggle("Look at highlighted NPCs", LookAtNPCDuringDialogue);
@@ -376,6 +389,8 @@ public class ObservePlugin : BaseUnityPlugin
             return;
         }
 
+        // TODO: This math sucks ass, rewrite it
+        
         var playerTransform = player.transform;
         bool isMirrored = player._pVisual._playerAppearanceStruct._isLeftHanded;
 
@@ -383,13 +398,14 @@ public class ObservePlugin : BaseUnityPlugin
         var targetAngle = Quaternion.Angle(playerTransform.rotation, targetLookRotation);
 
         const float MaxHeadRotation = 70f;
-
-        bool farLook = targetAngle >= 105;
-        bool reallyFarLook = targetAngle >= 160;
+        
+        bool isLookingBackwards = targetAngle >= 160;
 
         // When it's diametrally opposite from the forward direction and is using default mode,
         // opt to instead act as /observe camera
-        var wantsToLookAt = data.OverrideDirection != LookDirection.Default || !reallyFarLook || data.OwlMode ? targetLookRotation : GetDefaultModeBackwardLookDirection(data, player);
+        bool useBackwardLook = data.OverrideDirection == LookDirection.Default && isLookingBackwards && !data.OwlMode;
+        
+        var wantsToLookAt = useBackwardLook ? GetDefaultModeBackwardLookDirection(data, player) : targetLookRotation;
         
         Quaternion atBestCanLookAt = data.OwlMode ? wantsToLookAt : Quaternion.RotateTowards(data.Head.parent.rotation, wantsToLookAt, MaxHeadRotation);
         var currentHeadRotation = Quaternion.Slerp(data.LastHeadRotation, atBestCanLookAt, Time.deltaTime * data.LookSpeed.MapToMultiplier());
@@ -408,13 +424,27 @@ public class ObservePlugin : BaseUnityPlugin
             data.Head.rotation.Set(rot.x, -rot.y, -rot.z, rot.w);
         }
 
-        if (!data.OwlMode && data.OverrideDirection == LookDirection.Default && farLook && !reallyFarLook)
+        if (!data.OwlMode && !isLookingBackwards)
         {
             if (data.RaceModel._currentEyeCondition == EyeCondition.Center)
             {
-                float lookRightAngle = Quaternion.Angle(Quaternion.LookRotation(playerTransform.right * -1, playerTransform.up), wantsToLookAt);
+                Vector3 lookVec = wantsToLookAt * Vector3.forward;
+                Vector3 horizontalLookVec = lookVec - Vector3.Project(lookVec, playerTransform.up);
+                
+                float horizontalAngle = Vector3.Angle(horizontalLookVec, playerTransform.forward);
+                float verticalAngle = Vector3.Angle(lookVec, horizontalLookVec);
+                
+                bool isLookingRight = Vector3.Angle(lookVec, playerTransform.right) <= 90;
+                bool isLookingUp = Vector3.Angle(lookVec, playerTransform.up) <= 90;
+
+                bool horizontalTakesPriority = horizontalAngle >= verticalAngle * 0.85f;
+                
                 // If mirrored, need to reverse horizontal eye direction too
-                data.RaceModel.Set_EyeCondition((lookRightAngle <= 90) != isMirrored ? EyeCondition.Right : EyeCondition.Left, 0.15f);
+                if (horizontalTakesPriority && horizontalAngle >= 105)
+                    data.RaceModel.Set_EyeCondition(isLookingRight == isMirrored ? EyeCondition.Right : EyeCondition.Left, 0.15f);
+                
+                else if (!horizontalTakesPriority && verticalAngle >= 55)
+                    data.RaceModel.Set_EyeCondition(isLookingUp ? EyeCondition.Up : EyeCondition.Down, 0.15f);
             }
         }
 
@@ -422,6 +452,11 @@ public class ObservePlugin : BaseUnityPlugin
     }
 
     private static Quaternion GetMainPlayerTargetRotation(Transform headTransform)
+    {
+        return GetMainPlayerTargetDirection(headTransform) * ObservePlugin.SavedTilt;
+    }
+
+    private static Quaternion GetMainPlayerTargetDirection(Transform headTransform)
     {
         var player = Player._mainPlayer;
 
@@ -476,12 +511,23 @@ public class ObservePlugin : BaseUnityPlugin
 
     private static Quaternion GetDefaultModeBackwardLookDirection(PlayerLookInfo data, Player player)
     {
-        bool lookAtYourself = false;
-        
-        if (lookAtYourself)
+        if (BackwardLookModeSetting.Value == BackwardLookMode.FaceCamera)
             return Quaternion.LookRotation(-(data.DesiredLookDirection * Vector3.forward), player.transform.up);
         
-        return player.transform.rotation * Quaternion.Euler(0, 90, 0);
+        if (BackwardLookModeSetting.Value == BackwardLookMode.NoEffect)
+            return data.DesiredLookDirection;
+        
+        // We don't use the desired look direction, so we need to fix the tilt here
+        // TODO: This may be a desync issue?
+        
+        if (BackwardLookModeSetting.Value == BackwardLookMode.FaceBehindRight)
+            return player.transform.rotation * Quaternion.Euler(0, 160, 0) * SavedTilt;
+        
+        if (BackwardLookModeSetting.Value == BackwardLookMode.FaceBehindLeft)
+            return player.transform.rotation * Quaternion.Euler(0, -160, 0) * SavedTilt;
+
+        // FaceFront
+        return player.transform.rotation * SavedTilt;
     }
 
     internal static Transform? GetHeadBone(PlayerRaceModel raceModel)

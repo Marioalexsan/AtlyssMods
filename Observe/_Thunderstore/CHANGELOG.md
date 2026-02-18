@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-Feb-18
+
+### Added
+
+- Added `/observe freeze` - this is the same as `/observe pose`, except your current head direction is used instead of current camera direction
+- The behaviour of the camera when looking at frontal angles in `Default` look mode (without Owl mode enabled) is now configurable:
+  - `FaceBehindRight` - tries to look behind over the right shoulder (current / default behaviour)
+  - `FaceBehindLeft` - tries to look behind over the left shoulder
+  - `FaceCamera` - tries to look at the camera, as if `Camera` look mode were used
+  - `FaceFront` - tries to look forward, as if `/observe forward` were used
+  - `NoEffect` - doesn't change the behaviour in any way when looking at frontal angles (may act weird during movement!)
+- Added an EasySettings configuration option and `/observe frontal <mode>` command to configure the feature from above
+- Added `/observe tilt <left | right | reset> [angle]` that allows you to tilt your head left / right by the given number of degrees
+  - If not specified, the default angle is 18 degrees
+  - If specified, angle must be between 0 and 35 degrees
+
+### Changed
+
+- The character will now use up / down eye states when looking above / below 60 degrees
+
 ## [1.2.1] - 2025-Feb-15
 
 ### Fixed

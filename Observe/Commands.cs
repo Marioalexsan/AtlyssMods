@@ -22,10 +22,13 @@ internal static class Commands
         observeRoot.RegisterCommand("backward", "Look backward (might require Owl mode)", (caller, args) => LookCommand("backward", caller, args));
         observeRoot.RegisterCommand("camera", "Look at the camera", (caller, args) => LookCommand("camera", caller, args));
         observeRoot.RegisterCommand("pose", "Look relative to your current camera direction", (caller, args) => LookCommand("pose", caller, args));
+        observeRoot.RegisterCommand("freeze", "Freeze your current look direction", (caller, args) => LookCommand("freeze", caller, args));
         observeRoot.RegisterCommand("environment", "Look in the far distance based on your current camera direction", (caller, args) => LookCommand("environment", caller, args));
         observeRoot.RegisterCommand("owl", "Toggles Owl mode for yourself", ToggleOwl);
         observeRoot.RegisterCommand("vanilla", "Toggles Vanilla Mode for yourself", ToggleVanilla);
+        observeRoot.RegisterCommand("tilt", "Tilt your head left or right by the given angle", SetHeadTilt);
         observeRoot.RegisterCommand("speed", "Toggles look speed for yourself", $"Available options are {string.Join(", ", Enum.GetNames(typeof(LookSpeed)))}.", ToggleLookSpeed);
+        observeRoot.RegisterCommand("frontal", "Toggles behaviour of frontal angles for Default mode", $"Available options are {string.Join(", ", Enum.GetNames(typeof(BackwardLookMode)))}.", ChangeFrontalAngleMode);
     }
 
     private static bool ToggleOwl(Caller caller, string[] args)
@@ -68,6 +71,20 @@ internal static class Commands
         return true;
     }
 
+    private static bool ChangeFrontalAngleMode(Caller caller, string[] args)
+    {
+        if (args.Length != 1)
+            return false;
+
+        if (!Enum.TryParse<BackwardLookMode>(args[0], true, out var value))
+            return false;
+
+        ObservePlugin.BackwardLookModeSetting.Value = value;
+        Utils.NotifyCaller(caller, $"Frontal angle mode is now {value.ToString()}.");
+        
+        return true;
+    }
+
     private static bool LookCommand(string lookDirection, Caller caller, string[] args)
     {
         if (args.Length > 1)
@@ -103,6 +120,11 @@ internal static class Commands
                 ObservePlugin.SavedOverride = Quaternion.Inverse(Player._mainPlayer.transform.rotation) * CameraFunction._current.transform.rotation;
                 ObservePlugin.LocalOverrideDirection = LookDirection.Pose;
                 break;
+            case "freeze":
+                var headBone = ObservePlugin.GetHeadBone(Player._mainPlayer.GetComponentInChildren<PlayerRaceModel>());
+                ObservePlugin.SavedOverride = Quaternion.Inverse(Player._mainPlayer.transform.rotation) * headBone!.rotation;
+                ObservePlugin.LocalOverrideDirection = LookDirection.Pose;
+                break;
             case "environment":
                 ObservePlugin.SavedOverride = CameraFunction._current.transform.rotation;
                 ObservePlugin.LocalOverrideDirection = LookDirection.Environment;
@@ -130,6 +152,45 @@ internal static class Commands
             ObservePlugin.LocalOverrideDirectionTime = TimeSpan.FromDays(300);
         }
         
+        return true;
+    }
+
+    private static bool SetHeadTilt(Caller caller, string[] args)
+    {
+        if (args.Length > 2 || args.Length == 0)
+            return false;
+
+        int angle = 18;
+        const int MaxAngle = 35;
+
+        if (args.Length == 2)
+        {
+            if (!int.TryParse(args[1], out angle))
+            {
+                Utils.NotifyCaller(caller, $"\"{args[0]}\" is not right! It should be a valid angle in degrees!");
+                return false;
+            }
+            
+            if (angle < 0 || angle > MaxAngle)
+            {
+                Utils.NotifyCaller(caller, $"\"{args[0]}\" needs to be between 0 and {MaxAngle} degrees!");
+                return false;
+            }
+        }
+        
+        switch (args[0])
+        {
+            case "left":
+                ObservePlugin.SavedTilt = Quaternion.Euler(0, 0, angle);
+                break;
+            case "right":
+                ObservePlugin.SavedTilt = Quaternion.Euler(0, 0, -angle);
+                break;
+            default:
+                ObservePlugin.SavedTilt = Quaternion.identity;
+                break;
+        }
+
         return true;
     }
 }
