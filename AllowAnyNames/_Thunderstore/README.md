@@ -43,12 +43,24 @@ This means that the mod's data will be stored under `ATLYSS_Data/profileCollecti
 
 If you need to uninstall the mod for some reason, the game should revert to a sanitized version of the rich text name that is stored as part of the vanilla data.
 
+# Configuration options
+
+| Setting             | Description                                                                                                         | Acceptable Values                    | Default Value |
+|---------------------|---------------------------------------------------------------------------------------------------------------------|--------------------------------------|---------------|
+| ChatDisplayRTFNames | Specifies which players to display using RTF names in chat instead of the vanilla ones. Set to everyone by default. | `Everyone`, `Others`, `Self`, `None` | `Everyone`    |
+
 # Mod Compatibility
 
 AllowAnyNames targets the following game versions and mods:
 
-- ATLYSS 112025.a1
-- Multitool v1.0.0 (required dependency)
-- CodeYapper v2.0.0 (required dependency)
+- v2.1.0
+  - ATLYSS 12026.a3
+  - Multitool v1.0.0 (required dependency)
+  - CodeYapper v2.0.0 (required dependency)
+  - EasySettings v1.3.0 (optional dependency)
+- (undocumented) - v2.0.4
+  - ATLYSS 112025.a1
+  - Multitool v1.0.0 (required dependency)
+  - CodeYapper v2.0.0 (required dependency)
 
 Compatibility with other game versions and mods is not guaranteed, especially for updates with major changes.

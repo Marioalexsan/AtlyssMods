@@ -8,7 +8,7 @@
         <Product>AllowAnyNames</Product>
 
         <!-- Also set as plugin version and Thunderstore package version -->
-        <Version>2.0.4</Version>
+        <Version>2.1.0</Version>
     </PropertyGroup>
 
     <!-- Generic assembly info. -->
@@ -46,6 +46,7 @@
         <Reference Include="$(AtlyssManaged)com.rlabrecque.steamworks.net.dll" Private="False" />
 
         <PackageReference Include="Soggy_Pancake-CodeYapper" Version="2.0.0" Private="False" />
+        <PackageReference Include="Nessie-EasySettings" Version="1.3.0" Private="False" />
         
         <ProjectReference Include="..\Multitool\Multitool.csproj" />
     </ItemGroup>
